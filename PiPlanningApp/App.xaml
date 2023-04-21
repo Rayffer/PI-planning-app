@@ -4,6 +4,14 @@
              xmlns:local="clr-namespace:PiPlanningApp"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <DrawingImage x:Key="AddSvgIcon" x:Shared="False">
+            <DrawingImage.Drawing>
+                <DrawingGroup ClipGeometry="M0,0 V22.909069 H23.999969 V0 H0 Z">
+                    <DrawingGroup Opacity="1" Transform="1,0,0,1,-101.2954,-124.43648">
+                        <GeometryDrawing Brush="#FF000000" Geometry="F1 M23.999969,22.909069z M0,0z M111.65903,142.70919L111.65903,138.07284 106.47721,138.07284 101.2954,138.07284 101.2954,136.43648 101.2954,134.80012 106.47721,134.80012 111.65903,134.80012 111.65903,129.6183 111.65903,124.43648 113.28937,124.43648 114.91971,124.43648 114.99391,129.55012 115.06811,134.66375 120.18175,134.73795 125.29537,134.81215 125.29537,136.43648 125.29537,138.0608 120.18175,138.135 115.06811,138.2092 114.99331,142.77737 114.91861,147.34555 113.28884,147.34555 111.65908,147.34555z" />
+                    </DrawingGroup>
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
     </Application.Resources>
 </Application>
