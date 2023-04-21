@@ -11,7 +11,7 @@ namespace PiPlanningApp.Converters
         {
             if (value is int integerValue) 
             {
-                return string.Join(",", Enumerable.Range(0, integerValue));
+                return string.Join(",", Enumerable.Range(1, integerValue + 1));
             }
             return "";
         }

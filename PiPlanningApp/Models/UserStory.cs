@@ -6,9 +6,6 @@ namespace PiPlanningApp.Models;
 internal class UserStory : INotifyPropertyChanged
 {
     private string title;
-    private double storyPointsEstimation;
-    private Guid parentFeatureId;
-    private Guid parentIterationId;
     private bool isEditing;
     private double storyPoints;
 
@@ -19,36 +16,6 @@ internal class UserStory : INotifyPropertyChanged
         {
             this.title = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Title)));
-        }
-    }
-
-    public double StoryPointsEstimation
-    {
-        get => this.storyPointsEstimation;
-        set
-        {
-            this.storyPointsEstimation = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.StoryPointsEstimation)));
-        }
-    }
-
-    public Guid ParentIterationId
-    {
-        get => this.parentIterationId;
-        set
-        {
-            this.parentIterationId = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ParentIterationId)));
-        }
-    }
-
-    public Guid ParentFeatureId
-    {
-        get => this.parentFeatureId;
-        set
-        {
-            this.parentFeatureId = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ParentFeatureId)));
         }
     }
 
@@ -70,6 +37,7 @@ internal class UserStory : INotifyPropertyChanged
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.StoryPoints)));
         }
     }
+
 
 
     public event PropertyChangedEventHandler PropertyChanged;
