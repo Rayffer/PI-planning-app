@@ -622,18 +622,19 @@
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
                         </ItemsControl>
-                        <Button x:Name="AddUserStoryButton" 
-                                Visibility="Collapsed" 
+                        <Button
+                            x:Name="AddUserStoryButton"
                                 Grid.Row="1"
-                                Height="20" 
-                                Width="20" 
+                            Width="25"
+                            Height="25"
+                            Margin="3"
                                 Padding="3" 
-                                ToolTip="Add new user story" 
-                                VerticalAlignment="Top" 
                                 HorizontalAlignment="Right" 
+                            VerticalAlignment="Top"
                                 Command="{Binding AddUserStoryCommand, ElementName=MainWindowViewModel}" 
-                                Margin="3"
-                                CommandParameter="{Binding}">
+                            CommandParameter="{Binding}"
+                            ToolTip="Add new user story"
+                            Visibility="Collapsed">
                             <Image Source="{StaticResource AddSvgIcon}" />
                         </Button>
                     </Grid>
