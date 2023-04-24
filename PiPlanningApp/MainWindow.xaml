@@ -18,13 +18,25 @@
     WindowState="Maximized"
     mc:Ignorable="d">
     <Window.Resources>
-        <converters:IterationTitleConverter x:Key="IterationTitleConverter" />
+        <converters:IterationTitleMultiConverter x:Key="IterationTitleMultiConverter" />
         <converters:BooleanIsFalseToVisibilityConverter x:Key="BooleanIsFalseToVisibilityConverter" />
         <converters:BooleanIsTrueToVisibilityConverter x:Key="BooleanIsTrueToVisibilityConverter" />
-        <converters:GridColumnOrRowsToStartConverter x:Key="GridColumnOrRowsToStartConverter" />
+        <converters:GridColumnOrRowsSkipFirstToStarConverter x:Key="GridColumnOrRowsSkipFirstToStarConverter" />
         <converters:IntegerAddConverter x:Key="IntegerAddConverter" />
         <converters:FeaturesIterationsUserStoriesToGridElementMultiConverter x:Key="FeaturesIterationsUserStoriesToGridElementMultiConverter" />
-        <ContextMenu x:Key="FeatureContextMenu"></ContextMenu>
+        <converters:FeatureTypesSkipDefaultValueConverter x:Key="FeatureTypesSkipDefaultValueConverter" />
+        <converters:StringIsNotNullOrEmptyVisibilityConverter x:Key="StringIsNotNullOrEmptyVisibilityConverter" />
+        <converters:StringIsNullOrEmptyVisibilityConverter x:Key="StringIsNullOrEmptyVisibilityConverter" />
+        <converters:IntegerGreaterThanOrEqualToOtherVisibilityMultiConverter x:Key="IntegerGreaterThanOrEqualToOtherVisibilityMultiConverter" />
+        <ContextMenu x:Key="FeatureContextMenu" />
+        <ObjectDataProvider
+            x:Key="FeatureTypesEnum"
+            MethodName="GetValues"
+            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="types:FeatureTypes" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
         <datatemplateselectors:GridElementDataTemplateSelector x:Key="GridElementDataTemplateSelector">
             <datatemplateselectors:GridElementDataTemplateSelector.FeatureTemplate>
                 <DataTemplate DataType="models:Feature">
