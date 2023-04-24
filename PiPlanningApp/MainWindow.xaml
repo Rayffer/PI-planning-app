@@ -40,12 +40,48 @@
         <datatemplateselectors:GridElementDataTemplateSelector x:Key="GridElementDataTemplateSelector">
             <datatemplateselectors:GridElementDataTemplateSelector.FeatureTemplate>
                 <DataTemplate DataType="models:Feature">
-                    <Grid Margin="3" MinHeight="200" Width="300">
+                    <Grid
+                        Width="300"
+                        MinHeight="200"
+                        Margin="3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="35" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.Triggers>
+                            <EventTrigger RoutedEvent="MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard TargetProperty="Visibility" TargetName="EditFeatureButton">
+                                        <ObjectAnimationUsingKeyFrames>
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseLeave">
+                                <BeginStoryboard>
+                                    <Storyboard TargetProperty="Visibility" TargetName="EditFeatureButton">
+                                        <ObjectAnimationUsingKeyFrames>
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Grid.Triggers>
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -87,6 +123,9 @@
                         <Grid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Delete Feature">
+                                    <MenuItem.Icon>
+                                        <Image Source="{StaticResource RemoveSvgIcon}" />
+                                    </MenuItem.Icon>
                                     <MenuItem.Style>
                                         <Style TargetType="MenuItem">
                                             <Setter Property="Command" Value="{Binding Source={x:Reference Name=PIPlanningMainWindow}, Path=DataContext.DeleteFeatureCommand}" />
@@ -97,57 +136,99 @@
                             </ContextMenu>
                         </Grid.ContextMenu>
                         <TextBlock
+                            MinWidth="30"
+                            Margin="10,5,0,5"
+                            FontSize="{StaticResource Level3FontSize}"
+                            FontWeight="Bold"
                                     Text="{Binding FeatureNumber}"
-                                    Margin="10, 5, 0, 0"
-                                    Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}"
-                                    Cursor="Hand">
-                                    <behaviours:Interaction.Triggers>
-                                        <behaviours:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                            <behaviours:InvokeCommandAction Command="{Binding DataContext.EditFeatureCommand, ElementName=PIPlanningMainWindow}" CommandParameter="{Binding}" />
-                                        </behaviours:EventTrigger>
-                                    </behaviours:Interaction.Triggers>
-                        </TextBlock>
+                            Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
                         <controls:IntegerNumericTextbox
+                            MinWidth="30"
+                            Margin="10,5,0,5"
+                            VerticalAlignment="Top"
+                            VerticalContentAlignment="Center"
+                            FontSize="{StaticResource Level3FontSize}"
+                            Style="{StaticResource PlainTextBox}"
                                     Text="{Binding FeatureNumber}"
-                                    Margin="10, 5, 0, 0"
                                     Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
-                        <TextBlock Text="{Binding Title}"
-                                   TextWrapping="Wrap"
+                        <TextBlock
                                    Grid.Column="1"
                                    Grid.ColumnSpan="2"
-                                   Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}"
-                                   Margin="10, 5, 10, 0"
-                                   Cursor="Hand">
-                            <behaviours:Interaction.Triggers>
-                                <behaviours:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                    <behaviours:InvokeCommandAction Command="{Binding DataContext.EditFeatureCommand, ElementName=PIPlanningMainWindow}" CommandParameter="{Binding}" />
-                                </behaviours:EventTrigger>
-                            </behaviours:Interaction.Triggers>
-                        </TextBlock>
-                        <TextBox Grid.Column="1"
-                                         Grid.ColumnSpan="2"
-                                         Margin="10, 5, 10, 0"
+                            Margin="10,5,10,5"
+                            FontSize="{StaticResource Level3FontSize}"
+                            FontWeight="Bold"
+                            Text="{Binding Title}"
                                          TextWrapping="Wrap"
+                            Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
+                        <TextBox
+                            Grid.Column="1"
+                            Grid.ColumnSpan="2"
+                            Margin="10,5,10,5"
+                            FontSize="{StaticResource Level3FontSize}"
+                            MaxLines="3"
+                            Style="{StaticResource PlainTextBox}"
                                          Text="{Binding Title}"
+                            TextWrapping="Wrap"
+                            Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
+                        <WrapPanel Grid.Row="1" Grid.ColumnSpan="2">
+                            <TextBlock
+                                Margin="10,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                FontWeight="Bold"
+                                Text="Total Story Points" />
+                            <TextBlock
+                                Margin="10,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="{Binding TotalStoryPoints}" />
+                            <TextBlock
+                                Margin="10,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="SP" />
+                        </WrapPanel>
+                        <WrapPanel
+                            Grid.Row="2"
+                            Grid.ColumnSpan="2"
                                          Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}">
-                            <behaviours:Interaction.Triggers>
-                                <behaviours:DataTrigger Binding="{Binding Visibility, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="Visibility.Visible" Comparison="Equal">
-                                    <behaviours:ChangePropertyAction PropertyName="IsFocused" Value="True" />
-                                </behaviours:DataTrigger>
-                                <behaviours:EventTrigger EventName="LostFocus">
-                                    <behaviours:InvokeCommandAction Command="{Binding DataContext.EditFeatureCommand, ElementName=PIPlanningMainWindow}" CommandParameter="{Binding}" />
-                                </behaviours:EventTrigger>
-                            </behaviours:Interaction.Triggers>
-                            <TextBox.Style>
-                                <Style TargetType="TextBox">
+                            <TextBlock
+                                Margin="10,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                FontWeight="Bold"
+                                Text="Feature type:" />
+                            <ComboBox
+                                Margin="10,0,0,0"
+                                VerticalContentAlignment="Center"
+                                ItemsSource="{Binding Source={StaticResource FeatureTypesEnum}, Converter={StaticResource FeatureTypesSkipDefaultValueConverter}}"
+                                SelectedItem="{Binding FeatureType}" />
+                        </WrapPanel>
+                        <Button
+                            x:Name="EditFeatureButton"
+                            Grid.RowSpan="2"
+                            Grid.Column="2"
+                            Width="30"
+                            Height="30"
+                            Margin="3"
+                            Padding="3"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Command="{Binding EditFeatureCommand, ElementName=MainWindowViewModel}"
+                            CommandParameter="{Binding}"
+                            ToolTip="Add new user story"
+                            Visibility="Collapsed">
+                            <Image>
+                                <Image.Style>
+                                    <Style TargetType="Image">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Visibility, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="Visible">
-                                            <Setter Property="FocusManager.FocusedElement" Value="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                            <DataTrigger Binding="{Binding IsEditing}" Value="False">
+                                                <Setter Property="Source" Value="{StaticResource EditSvgIcon}" />
                                         </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                <Setter Property="Source" Value="{StaticResource ConfirmSvgIcon}" />
+                                            </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </TextBox.Style>
-                        </TextBox>
+                                </Image.Style>
+                            </Image>
+                        </Button>
                     </Grid>
                 </DataTemplate>
             </datatemplateselectors:GridElementDataTemplateSelector.FeatureTemplate>
