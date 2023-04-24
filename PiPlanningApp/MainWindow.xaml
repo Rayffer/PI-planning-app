@@ -698,7 +698,8 @@
             <ItemsControl
                     Grid.RowSpan="2"
                     Grid.ColumnSpan="2"
-                    ItemTemplateSelector="{StaticResource GridElementDataTemplateSelector}">
+                    ItemTemplateSelector="{StaticResource GridElementDataTemplateSelector}"
+                    Margin="0, 0, 0, 40">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Grid
