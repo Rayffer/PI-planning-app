@@ -1,21 +1,22 @@
-﻿<Window x:Class="PiPlanningApp.MainWindow"
+﻿<Window
+    x:Class="PiPlanningApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:behaviours="http://schemas.microsoft.com/xaml/behaviors"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        xmlns:local="clr-namespace:PiPlanningApp"
         xmlns:controls="clr-namespace:PiPlanningApp.Controls"
         xmlns:converters="clr-namespace:PiPlanningApp.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:datatemplateselectors="clr-namespace:PiPlanningApp.DataTemplateSelectors"
+    xmlns:local="clr-namespace:PiPlanningApp"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:PiPlanningApp.Models"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:types="clr-namespace:PiPlanningApp.Types"
-        mc:Ignorable="d"
-        Title="PI Planning Application"
         x:Name="PIPlanningMainWindow"
+    Title="PI Planning Application"
         d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
-        WindowState="Maximized">
+    WindowState="Maximized"
+    mc:Ignorable="d">
     <Window.Resources>
         <converters:IterationTitleConverter x:Key="IterationTitleConverter" />
         <converters:BooleanIsFalseToVisibilityConverter x:Key="BooleanIsFalseToVisibilityConverter" />
@@ -167,8 +168,8 @@
                         <Grid.Triggers>
                             <EventTrigger RoutedEvent="MouseEnter">
                                 <BeginStoryboard>
-                                    <Storyboard TargetName="AddUserStoryButton" TargetProperty="Visibility" >
-                                        <ObjectAnimationUsingKeyFrames >
+                                    <Storyboard TargetProperty="Visibility" TargetName="AddUserStoryButton">
+                                        <ObjectAnimationUsingKeyFrames>
                                             <DiscreteObjectKeyFrame KeyTime="0:0:0">
                                                 <DiscreteObjectKeyFrame.Value>
                                                     <Visibility>Visible</Visibility>
@@ -180,7 +181,7 @@
                             </EventTrigger>
                             <EventTrigger RoutedEvent="MouseLeave">
                                 <BeginStoryboard>
-                                    <Storyboard TargetName="AddUserStoryButton" TargetProperty="Visibility" >
+                                    <Storyboard TargetProperty="Visibility" TargetName="AddUserStoryButton">
                                         <ObjectAnimationUsingKeyFrames>
                                             <DiscreteObjectKeyFrame KeyTime="0:0:0">
                                                 <DiscreteObjectKeyFrame.Value>
