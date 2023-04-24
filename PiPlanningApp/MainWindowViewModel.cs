@@ -1,35 +1,24 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
 
-using PiPlanningApp.Commands;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
 using PiPlanningApp.Models;
 using PiPlanningApp.Repositories;
 using PiPlanningApp.Types;
 
 namespace PiPlanningApp;
 
-internal class MainWindowViewModel : INotifyPropertyChanged
+internal partial class MainWindowViewModel : ObservableObject
 {
     private readonly IInformationRepository informationRepository;
 
     public ObservableCollection<Iteration> Iterations { get; set; } = new();
     public ObservableCollection<Feature> Features { get; set; } = new();
     public ObservableCollection<IterationFeatureSlot> IterationFeatureSlots { get; set; } = new();
-
-    public RelayCommand AddFeatureCommand { get; }
-    public RelayCommand AddIterationCommand { get; }
-    public RelayCommand AddUserStoryCommand { get; }
-    public RelayCommand DeleteFeatureCommand { get; }
-    public RelayCommand DeleteIterationCommand { get; }
-    public RelayCommand DeleteUserStoryCommand { get; }
-    public RelayCommand EditFeatureCommand { get; }
-    public RelayCommand EditIterationCommand { get; }
-    public RelayCommand EditUserStoryCommand { get; }
-
-    public event PropertyChangedEventHandler PropertyChanged;
 
     public MainWindowViewModel() : this(new JsonInformationRepository(ConfigurationManager.AppSettings["InformationFile"]))
     {
@@ -44,18 +33,9 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         this.informationRepository.ApplicationInformation.Iterations.ForEach(this.AddNewIteration);
         this.IterationFeatureSlots.Clear();
         this.informationRepository.ApplicationInformation.IterationFeatureSlots.ForEach(this.IterationFeatureSlots.Add);
-
-        this.AddFeatureCommand = new RelayCommand(_ => this.AddAndSaveNewFeature());
-        this.AddIterationCommand = new RelayCommand(_ => this.AddAndSaveNewIteration());
-        this.AddUserStoryCommand = new RelayCommand(this.AddAndSaveNewUserStory);
-        this.DeleteFeatureCommand = new RelayCommand(this.RemoveAndSaveFeature, _ => this.Features.Count > 1);
-        this.DeleteIterationCommand = new RelayCommand(this.RemoveAndSaveIteration, _ => this.Iterations.Count > 1);
-        this.DeleteUserStoryCommand = new RelayCommand(this.RemoveAndSaveUserStory);
-        this.EditFeatureCommand = new RelayCommand(this.EditAndSaveFeature);
-        this.EditIterationCommand = new RelayCommand(this.EditAndSaveIteration);
-        this.EditUserStoryCommand = new RelayCommand(this.EditAndSaveUserStory);
     }
 
+    [RelayCommand]
     private void EditAndSaveUserStory(object obj)
     {
         if (obj is not UserStory userStoryToEdit)
@@ -78,6 +58,7 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    [RelayCommand]
     private void EditAndSaveIteration(object obj)
     {
         if (obj is not Iteration iterationToEdit)
@@ -93,6 +74,7 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    [RelayCommand]
     private void EditAndSaveFeature(object obj)
     {
         if (obj is not Feature featureToEdit)
@@ -108,6 +90,7 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    [RelayCommand(CanExecute = nameof(CanExecuteRemoveAndSaveIteration))]
     private void RemoveAndSaveIteration(object obj)
     {
         if (obj is not Iteration iteration)
@@ -131,16 +114,19 @@ internal class MainWindowViewModel : INotifyPropertyChanged
             iterationFeatureSlot.ColumnPosition = this.Iterations.Single(iteration => iteration.Id == iterationFeatureSlot.ParentIterationId).ColumnPosition;
         }
 
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Iterations)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Iterations.Count)));
+        this.OnPropertyChanged(nameof(this.Iterations));
+        this.OnPropertyChanged(nameof(this.Iterations.Count));
 
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots.Count)));
+        this.OnPropertyChanged(nameof(this.IterationFeatureSlots));
+        this.OnPropertyChanged(nameof(this.IterationFeatureSlots.Count));
 
         this.informationRepository.ApplicationInformation.Iterations.Remove(iteration);
         this.informationRepository.SaveChanges();
     }
 
+    private bool CanExecuteRemoveAndSaveIteration() => this.Features.Count > 1;
+
+    [RelayCommand(CanExecute = nameof(CanExecuteRemoveAndSaveFeature))]
     private void RemoveAndSaveFeature(object obj)
     {
         if (obj is not Feature feature)
@@ -163,16 +149,19 @@ internal class MainWindowViewModel : INotifyPropertyChanged
             iterationFeatureSlot.RowPosition = this.Features.Single(feature => feature.Id == iterationFeatureSlot.ParentFeatureId).RowPosition;
         }
 
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Features)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Features.Count)));
+        this.OnPropertyChanged(nameof(this.Features));
+        this.OnPropertyChanged(nameof(this.Features.Count));
 
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots.Count)));
+        this.OnPropertyChanged(nameof(this.IterationFeatureSlots));
+        this.OnPropertyChanged(nameof(this.IterationFeatureSlots.Count));
 
         this.informationRepository.ApplicationInformation.Features.Remove(feature);
         this.informationRepository.SaveChanges();
     }
 
+    private bool CanExecuteRemoveAndSaveFeature() => this.Features.Count > 1;
+
+    [RelayCommand]
     private void RemoveAndSaveUserStory(object obj)
     {
         if (obj is not UserStory userStory)
@@ -214,6 +203,7 @@ internal class MainWindowViewModel : INotifyPropertyChanged
             }
     }
 
+    [RelayCommand]
     private void AddAndSaveNewFeature()
     {
         var featureToAdd = new Feature
@@ -231,6 +221,7 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         this.informationRepository.SaveChanges();
     }
 
+    [RelayCommand]
     private void AddAndSaveNewIteration()
     {
         var iterationToAdd = new Iteration
@@ -247,6 +238,7 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         this.informationRepository.SaveChanges();
     }
 
+    [RelayCommand]
     private void AddAndSaveNewUserStory(object obj)
     {
         if (obj is not IterationFeatureSlot iterationFeatureSlot)
@@ -280,11 +272,11 @@ internal class MainWindowViewModel : INotifyPropertyChanged
             });
         }
 
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Features)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Features.Count)));
+        this.OnPropertyChanged(nameof(this.Features));
+        this.OnPropertyChanged(nameof(this.Features.Count));
 
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots.Count)));
+        this.OnPropertyChanged(nameof(this.IterationFeatureSlots));
+        this.OnPropertyChanged(nameof(this.IterationFeatureSlots.Count));
     }
 
     private void AddNewIteration(Iteration iterationToAdd)
@@ -303,11 +295,11 @@ internal class MainWindowViewModel : INotifyPropertyChanged
             });
         }
 
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Iterations)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Iterations.Count)));
+        this.OnPropertyChanged(nameof(this.Iterations));
+        this.OnPropertyChanged(nameof(this.Iterations.Count));
 
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots.Count)));
+        this.OnPropertyChanged(nameof(this.IterationFeatureSlots));
+        this.OnPropertyChanged(nameof(this.IterationFeatureSlots.Count));
     }
 
     public void SaveChanges()

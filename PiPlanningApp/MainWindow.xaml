@@ -54,34 +54,14 @@
                             <RowDefinition Height="35" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <Grid.Triggers>
-                            <EventTrigger RoutedEvent="MouseEnter">
-                                <BeginStoryboard>
-                                    <Storyboard TargetProperty="Visibility" TargetName="EditFeatureButton">
-                                        <ObjectAnimationUsingKeyFrames>
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <Visibility>Visible</Visibility>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                            <EventTrigger RoutedEvent="MouseLeave">
-                                <BeginStoryboard>
-                                    <Storyboard TargetProperty="Visibility" TargetName="EditFeatureButton">
-                                        <ObjectAnimationUsingKeyFrames>
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <Visibility>Collapsed</Visibility>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </Grid.Triggers>
+                        <behaviours:Interaction.Triggers>
+                            <behaviours:EventTrigger EventName="MouseEnter">
+                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditFeatureButton" Value="{x:Static Visibility.Visible}" />
+                            </behaviours:EventTrigger>
+                            <behaviours:EventTrigger EventName="MouseLeave">
+                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditFeatureButton" Value="{x:Static Visibility.Collapsed}" />
+                            </behaviours:EventTrigger>
+                        </behaviours:Interaction.Triggers>
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -128,7 +108,7 @@
                                     </MenuItem.Icon>
                                     <MenuItem.Style>
                                         <Style TargetType="MenuItem">
-                                            <Setter Property="Command" Value="{Binding Source={x:Reference Name=PIPlanningMainWindow}, Path=DataContext.DeleteFeatureCommand}" />
+                                            <Setter Property="Command" Value="{Binding Source={x:Reference Name=PIPlanningMainWindow}, Path=DataContext.RemoveAndSaveFeatureCommand}" />
                                             <Setter Property="CommandParameter" Value="{Binding}" />
                                         </Style>
                                     </MenuItem.Style>
@@ -210,10 +190,21 @@
                             Padding="3"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
-                            Command="{Binding EditFeatureCommand, ElementName=MainWindowViewModel}"
+                            Command="{Binding EditAndSaveFeatureCommand, ElementName=MainWindowViewModel}"
                             CommandParameter="{Binding}"
-                            ToolTip="Add new user story"
                             Visibility="Collapsed">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsEditing}" Value="False">
+                                            <Setter Property="ToolTip" Value="Edit feature" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                            <Setter Property="ToolTip" Value="Save changes" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
                             <Image>
                                 <Image.Style>
                                     <Style TargetType="Image">
@@ -250,34 +241,14 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Grid.Triggers>
-                            <EventTrigger RoutedEvent="MouseEnter">
-                                <BeginStoryboard>
-                                    <Storyboard TargetProperty="Visibility" TargetName="EditIterationButton">
-                                        <ObjectAnimationUsingKeyFrames>
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <Visibility>Visible</Visibility>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                            <EventTrigger RoutedEvent="MouseLeave">
-                                <BeginStoryboard>
-                                    <Storyboard TargetProperty="Visibility" TargetName="EditIterationButton">
-                                        <ObjectAnimationUsingKeyFrames>
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <Visibility>Collapsed</Visibility>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </Grid.Triggers>
+                        <behaviours:Interaction.Triggers>
+                            <behaviours:EventTrigger EventName="MouseEnter">
+                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditIterationButton" Value="{x:Static Visibility.Visible}" />
+                            </behaviours:EventTrigger>
+                            <behaviours:EventTrigger EventName="MouseLeave">
+                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditIterationButton" Value="{x:Static Visibility.Collapsed}" />
+                            </behaviours:EventTrigger>
+                        </behaviours:Interaction.Triggers>
                         <Grid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Delete iteration">
@@ -286,7 +257,7 @@
                                     </MenuItem.Icon>
                                     <MenuItem.Style>
                                         <Style TargetType="MenuItem">
-                                            <Setter Property="Command" Value="{Binding Source={x:Reference Name=PIPlanningMainWindow}, Path=DataContext.DeleteIterationCommand}" />
+                                            <Setter Property="Command" Value="{Binding Source={x:Reference Name=PIPlanningMainWindow}, Path=DataContext.RemoveAndSaveIterationCommand}" />
                                             <Setter Property="CommandParameter" Value="{Binding}" />
                                         </Style>
                                     </MenuItem.Style>
@@ -419,10 +390,21 @@
                             Padding="3"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
-                            Command="{Binding EditIterationCommand, ElementName=MainWindowViewModel}"
+                            Command="{Binding EditAndSaveIterationCommand, ElementName=MainWindowViewModel}"
                             CommandParameter="{Binding}"
-                            ToolTip="Add new user story"
                             Visibility="Collapsed">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsEditing}" Value="False">
+                                            <Setter Property="ToolTip" Value="Edit iteration" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                            <Setter Property="ToolTip" Value="Save changes" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
                             <Image>
                                 <Image.Style>
                                     <Style TargetType="Image">
@@ -448,34 +430,14 @@
                         AllowDrop="True"
                         Background="LightSlateGray"
                         Drop="Grid_Drop">
-                        <Grid.Triggers>
-                            <EventTrigger RoutedEvent="MouseEnter">
-                                <BeginStoryboard>
-                                    <Storyboard TargetProperty="Visibility" TargetName="AddUserStoryButton">
-                                        <ObjectAnimationUsingKeyFrames>
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <Visibility>Visible</Visibility>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                            <EventTrigger RoutedEvent="MouseLeave">
-                                <BeginStoryboard>
-                                    <Storyboard TargetProperty="Visibility" TargetName="AddUserStoryButton">
-                                        <ObjectAnimationUsingKeyFrames>
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
-                                                <DiscreteObjectKeyFrame.Value>
-                                                    <Visibility>Collapsed</Visibility>
-                                                </DiscreteObjectKeyFrame.Value>
-                                            </DiscreteObjectKeyFrame>
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </Grid.Triggers>
+                        <behaviours:Interaction.Triggers>
+                            <behaviours:EventTrigger EventName="MouseEnter">
+                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="AddUserStoryButton" Value="{x:Static Visibility.Visible}" />
+                            </behaviours:EventTrigger>
+                            <behaviours:EventTrigger EventName="MouseLeave">
+                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="AddUserStoryButton" Value="{x:Static Visibility.Collapsed}" />
+                            </behaviours:EventTrigger>
+                        </behaviours:Interaction.Triggers>
                         <ItemsControl AlternationCount="{x:Static sys:Int32.MaxValue}" ItemsSource="{Binding UserStories}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -495,34 +457,14 @@
                                             <RowDefinition />
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
-                                        <Grid.Triggers>
-                                            <EventTrigger RoutedEvent="MouseEnter">
-                                                <BeginStoryboard>
-                                                    <Storyboard TargetProperty="Visibility" TargetName="EditUserStoryButton">
-                                                        <ObjectAnimationUsingKeyFrames>
-                                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
-                                                                <DiscreteObjectKeyFrame.Value>
-                                                                    <Visibility>Visible</Visibility>
-                                                                </DiscreteObjectKeyFrame.Value>
-                                                            </DiscreteObjectKeyFrame>
-                                                        </ObjectAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger>
-                                            <EventTrigger RoutedEvent="MouseLeave">
-                                                <BeginStoryboard>
-                                                    <Storyboard TargetProperty="Visibility" TargetName="EditUserStoryButton">
-                                                        <ObjectAnimationUsingKeyFrames>
-                                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
-                                                                <DiscreteObjectKeyFrame.Value>
-                                                                    <Visibility>Collapsed</Visibility>
-                                                                </DiscreteObjectKeyFrame.Value>
-                                                            </DiscreteObjectKeyFrame>
-                                                        </ObjectAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger>
-                                        </Grid.Triggers>
+                                        <behaviours:Interaction.Triggers>
+                                            <behaviours:EventTrigger EventName="MouseEnter">
+                                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditUserStoryButton" Value="{x:Static Visibility.Visible}" />
+                                            </behaviours:EventTrigger>
+                                            <behaviours:EventTrigger EventName="MouseLeave">
+                                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditUserStoryButton" Value="{x:Static Visibility.Collapsed}" />
+                                            </behaviours:EventTrigger>
+                                        </behaviours:Interaction.Triggers>
                                         <Grid.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Delete user story">
@@ -531,7 +473,7 @@
                                                     </MenuItem.Icon>
                                                     <MenuItem.Style>
                                                         <Style TargetType="MenuItem">
-                                                            <Setter Property="Command" Value="{Binding Source={x:Reference Name=PIPlanningMainWindow}, Path=DataContext.DeleteUserStoryCommand}" />
+                                                            <Setter Property="Command" Value="{Binding Source={x:Reference Name=PIPlanningMainWindow}, Path=DataContext.RemoveAndSaveUserStoryCommand}" />
                                                             <Setter Property="CommandParameter" Value="{Binding}" />
                                                         </Style>
                                                     </MenuItem.Style>
@@ -596,10 +538,21 @@
                                             Padding="3"
                                             HorizontalAlignment="Right"
                                             VerticalAlignment="Top"
-                                            Command="{Binding EditUserStoryCommand, ElementName=MainWindowViewModel}"
+                                            Command="{Binding EditAndSaveUserStoryCommand, ElementName=MainWindowViewModel}"
                                             CommandParameter="{Binding}"
-                                            ToolTip="Add new user story"
                                             Visibility="Collapsed">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsEditing}" Value="False">
+                                                            <Setter Property="ToolTip" Value="Edit user story" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                            <Setter Property="ToolTip" Value="Save changes" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
                                             <Image>
                                                 <Image.Style>
                                                     <Style TargetType="Image">
@@ -633,7 +586,7 @@
                             Padding="3"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
-                            Command="{Binding AddUserStoryCommand, ElementName=MainWindowViewModel}"
+                            Command="{Binding AddAndSaveNewUserStoryCommand, ElementName=MainWindowViewModel}"
                             CommandParameter="{Binding}"
                             ToolTip="Add new user story"
                             Visibility="Collapsed">
@@ -679,7 +632,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Bottom"
                     Panel.ZIndex="1"
-                    Command="{Binding AddFeatureCommand}"
+                    Command="{Binding AddAndSaveNewFeatureCommand}"
                     ToolTip="Add new feature">
                 <Image Source="{StaticResource AddSvgIcon}" />
             </Button>
@@ -691,7 +644,7 @@
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     Panel.ZIndex="1"
-                    Command="{Binding AddIterationCommand}"
+                    Command="{Binding AddAndSaveNewIterationCommand}"
                     ToolTip="Add new iteration">
                 <Image Source="{StaticResource AddSvgIcon}" />
             </Button>

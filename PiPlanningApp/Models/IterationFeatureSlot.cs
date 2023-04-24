@@ -1,75 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace PiPlanningApp.Models;
 
-public class IterationFeatureSlot : INotifyPropertyChanged
+public partial class IterationFeatureSlot : ObservableObject
 {
+    [ObservableProperty]
     private Guid parentFeatureId;
+
+    [ObservableProperty]
     private Guid parentIterationId;
+
+    [ObservableProperty]
     private int rowPosition;
+
+    [ObservableProperty]
     private int columnPosition;
 
-    public Guid ParentIterationId
-    {
-        get => this.parentIterationId;
-        set
-        {
-            this.parentIterationId = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ParentIterationId)));
-        }
-    }
-
-    public Guid ParentFeatureId
-    {
-        get => this.parentFeatureId;
-        set
-        {
-            this.parentFeatureId = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ParentFeatureId)));
-        }
-    }
-
-    public int RowPosition
-    {
-        get => this.rowPosition;
-        set
-        {
-            this.rowPosition = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.RowPosition)));
-        }
-    }
-
-    public int ColumnPosition
-    {
-        get => this.columnPosition;
-        set
-        {
-            this.columnPosition = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ColumnPosition)));
-        }
-    }
-
     public ObservableCollection<UserStory> UserStories { get; set; } = new();
-
-    public event PropertyChangedEventHandler PropertyChanged;
 
     public void RemoveUserStory(UserStory userStory)
     {
         this.UserStories.Remove(userStory);
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.UserStories)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.UserStories.Count)));
+        this.OnPropertyChanged(nameof(this.UserStories));
+        this.OnPropertyChanged(nameof(this.UserStories.Count));
     }
 
     public void AddNewUserStory(UserStory userStory)
     {
         this.UserStories.Add(userStory);
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.UserStories)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.UserStories.Count)));
+        this.OnPropertyChanged(nameof(this.UserStories));
+        this.OnPropertyChanged(nameof(this.UserStories.Count));
     }
 }
