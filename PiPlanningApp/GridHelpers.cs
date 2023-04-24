@@ -34,13 +34,13 @@ public class GridHelpers
     public static void RowCountChanged(
         DependencyObject obj, DependencyPropertyChangedEventArgs e)
     {
-        if (!(obj is Grid) || (int)e.NewValue < 0)
+        if (obj is not Grid || (int)e.NewValue < 0)
             return;
 
-        Grid grid = (Grid)obj;
+        var grid = (Grid)obj;
         grid.RowDefinitions.Clear();
 
-        for (int i = 0; i < (int)e.NewValue; i++)
+        for (var i = 0; i < (int)e.NewValue; i++)
             grid.RowDefinitions.Add(
                 new RowDefinition() { Height = GridLength.Auto });
 
@@ -76,13 +76,13 @@ public class GridHelpers
     public static void ColumnCountChanged(
         DependencyObject obj, DependencyPropertyChangedEventArgs e)
     {
-        if (!(obj is Grid) || (int)e.NewValue < 0)
+        if (obj is not Grid || (int)e.NewValue < 0)
             return;
 
-        Grid grid = (Grid)obj;
+        var grid = (Grid)obj;
         grid.ColumnDefinitions.Clear();
 
-        for (int i = 0; i < (int)e.NewValue; i++)
+        for (var i = 0; i < (int)e.NewValue; i++)
             grid.ColumnDefinitions.Add(
                 new ColumnDefinition() { Width = GridLength.Auto });
 
@@ -118,7 +118,7 @@ public class GridHelpers
     public static void StarRowsChanged(
         DependencyObject obj, DependencyPropertyChangedEventArgs e)
     {
-        if (!(obj is Grid) || string.IsNullOrEmpty(e.NewValue.ToString()))
+        if (obj is not Grid || string.IsNullOrEmpty(e.NewValue.ToString()))
             return;
 
         SetStarRows((Grid)obj);
@@ -153,7 +153,7 @@ public class GridHelpers
     public static void StarColumnsChanged(
         DependencyObject obj, DependencyPropertyChangedEventArgs e)
     {
-        if (!(obj is Grid) || string.IsNullOrEmpty(e.NewValue.ToString()))
+        if (obj is not Grid || string.IsNullOrEmpty(e.NewValue.ToString()))
             return;
 
         SetStarColumns((Grid)obj);
@@ -163,10 +163,10 @@ public class GridHelpers
 
     private static void SetStarColumns(Grid grid)
     {
-        string[] starColumns =
+        var starColumns =
             GetStarColumns(grid).Split(',');
 
-        for (int i = 0; i < grid.ColumnDefinitions.Count; i++)
+        for (var i = 0; i < grid.ColumnDefinitions.Count; i++)
         {
             if (starColumns.Contains(i.ToString()))
                 grid.ColumnDefinitions[i].Width =
@@ -176,10 +176,10 @@ public class GridHelpers
 
     private static void SetStarRows(Grid grid)
     {
-        string[] starRows =
+        var starRows =
             GetStarRows(grid).Split(',');
 
-        for (int i = 0; i < grid.RowDefinitions.Count; i++)
+        for (var i = 0; i < grid.RowDefinitions.Count; i++)
         {
             if (starRows.Contains(i.ToString()))
                 grid.RowDefinitions[i].Height =
