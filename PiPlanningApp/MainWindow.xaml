@@ -479,15 +479,14 @@
                         <ItemsControl AlternationCount="{x:Static sys:Int32.MaxValue}" ItemsSource="{Binding UserStories}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <Grid Margin="20,10" local:GridHelpers.RowCount="{Binding UserStories.Count}" />
+                                    <Grid Margin="15,10" local:GridHelpers.RowCount="{Binding UserStories.Count}" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid
                                         Height="150"
-                                        MinWidth="200"
-                                        MaxWidth="300"
+                                        Width="200"
                                         Margin="3"
                                         Background="Gold"
                                         MouseMove="Grid_MouseMove">
@@ -543,12 +542,15 @@
                                             Margin="10,5,10,0"
                                             FontSize="{StaticResource Level4FontSize}"
                                             Text="{Binding Title}"
+                                            TextWrapping="Wrap"
                                             Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
                                         <TextBox
                                             Margin="10,5,10,0"
                                             FontSize="{StaticResource Level4FontSize}"
                                             Style="{StaticResource PlainTextBox}"
                                             Text="{Binding Title}"
+                                            TextWrapping="Wrap"
+                                            AcceptsReturn="True"
                                             Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
                                         <WrapPanel
                                             Grid.Row="2"
