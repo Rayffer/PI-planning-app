@@ -1,49 +1,21 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.Linq;
 
 using PiPlanningApp.Commands;
 using PiPlanningApp.Models;
+using PiPlanningApp.Repositories;
 using PiPlanningApp.Types;
 
 namespace PiPlanningApp;
 
 internal class MainWindowViewModel : INotifyPropertyChanged
 {
-    public ObservableCollection<Iteration> Iterations { get; set; } = new() {
-        new Iteration
-        {
-            ColumnPosition = 0,
-            Id = Guid.NewGuid()
-        },
-        new Iteration
-        {
-            ColumnPosition = 1,
-            Id = Guid.NewGuid()
-        },
-        new Iteration
-        {
-            ColumnPosition = 2,
-            Id = Guid.NewGuid()
-        },
-        new Iteration
-        {
-            ColumnPosition = 3,
-            Id = Guid.NewGuid()
-        },
-        new Iteration
-        {
-            ColumnPosition = 4,
-            Id = Guid.NewGuid()
-        },
-        new Iteration
-        {
-            ColumnPosition = 5,
-            Id = Guid.NewGuid(),
-            IterationName = "IP"
-        },
-    };
+    private readonly IInformationRepository informationRepository;
+
+    public ObservableCollection<Iteration> Iterations { get; set; } = new();
     public ObservableCollection<Feature> Features { get; set; } = new();
     public ObservableCollection<IterationFeatureSlot> IterationFeatureSlots { get; set; } = new();
 
@@ -59,22 +31,32 @@ internal class MainWindowViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel() : this(new JsonInformationRepository(ConfigurationManager.AppSettings["InformationFile"]))
     {
-        this.AddNewFeature();
-
-        this.AddFeatureCommand = new RelayCommand(_ => this.AddNewFeature());
-        this.AddIterationCommand = new RelayCommand(_ => this.AddNewIteration());
-        this.AddUserStoryCommand = new RelayCommand(this.AddNewUserStory);
-        this.DeleteFeatureCommand = new RelayCommand(this.RemoveFeature, _ => this.Features.Count > 1);
-        this.DeleteIterationCommand = new RelayCommand(this.RemoveIteration, _ => this.Iterations.Count > 1);
-        this.DeleteUserStoryCommand = new RelayCommand(this.RemoveUserStory);
-        this.EditFeatureCommand = new RelayCommand(this.EditFeature);
-        this.EditIterationCommand = new RelayCommand(this.EditIteration);
-        this.EditUserStoryCommand = new RelayCommand(this.EditUserStory);
     }
 
-    private void EditUserStory(object obj)
+    internal MainWindowViewModel(IInformationRepository informationRepository)
+    {
+        this.informationRepository = informationRepository;
+
+        this.informationRepository.ReadInformation();
+        this.informationRepository.ApplicationInformation.Features.ForEach(this.AddNewFeature);
+        this.informationRepository.ApplicationInformation.Iterations.ForEach(this.AddNewIteration);
+        this.IterationFeatureSlots.Clear();
+        this.informationRepository.ApplicationInformation.IterationFeatureSlots.ForEach(this.IterationFeatureSlots.Add);
+
+        this.AddFeatureCommand = new RelayCommand(_ => this.AddAndSaveNewFeature());
+        this.AddIterationCommand = new RelayCommand(_ => this.AddAndSaveNewIteration());
+        this.AddUserStoryCommand = new RelayCommand(this.AddAndSaveNewUserStory);
+        this.DeleteFeatureCommand = new RelayCommand(this.RemoveAndSaveFeature, _ => this.Features.Count > 1);
+        this.DeleteIterationCommand = new RelayCommand(this.RemoveAndSaveIteration, _ => this.Iterations.Count > 1);
+        this.DeleteUserStoryCommand = new RelayCommand(this.RemoveAndSaveUserStory);
+        this.EditFeatureCommand = new RelayCommand(this.EditAndSaveFeature);
+        this.EditIterationCommand = new RelayCommand(this.EditAndSaveIteration);
+        this.EditUserStoryCommand = new RelayCommand(this.EditAndSaveUserStory);
+    }
+
+    private void EditAndSaveUserStory(object obj)
     {
         if (obj is not UserStory userStoryToEdit)
         {
@@ -83,9 +65,20 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         this.ClearOtherItemsInEdition(obj);
 
         userStoryToEdit.IsEditing = !userStoryToEdit.IsEditing;
+        if (!userStoryToEdit.IsEditing)
+        {
+            var featureIterationSlot = this.IterationFeatureSlots.First(x => x.UserStories.Contains(userStoryToEdit));
+            var parentIteration = this.Iterations.First(x => x.Id == featureIterationSlot.ParentIterationId);
+            var parentFeature = this.Features.First(x => x.Id == featureIterationSlot.ParentFeatureId);
+
+            parentIteration.LoadCapacity = this.IterationFeatureSlots.Where(x => x.ParentIterationId == parentIteration.Id).Sum(x => x.UserStories.Sum(y => y.StoryPoints));
+            parentFeature.TotalStoryPoints = this.IterationFeatureSlots.Where(x => x.ParentFeatureId == parentFeature.Id).Sum(x => x.UserStories.Sum(y => y.StoryPoints));
+
+            this.informationRepository.SaveChanges();
+        }
     }
 
-    private void EditIteration(object obj)
+    private void EditAndSaveIteration(object obj)
     {
         if (obj is not Iteration iterationToEdit)
         {
@@ -94,9 +87,13 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         this.ClearOtherItemsInEdition(obj);
 
         iterationToEdit.IsEditing = !iterationToEdit.IsEditing;
+        if (!iterationToEdit.IsEditing)
+        {
+            this.informationRepository.SaveChanges();
+        }
     }
 
-    private void EditFeature(object obj)
+    private void EditAndSaveFeature(object obj)
     {
         if (obj is not Feature featureToEdit)
         {
@@ -105,9 +102,13 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         this.ClearOtherItemsInEdition(obj);
 
         featureToEdit.IsEditing = !featureToEdit.IsEditing;
+        if (!featureToEdit.IsEditing)
+        {
+            this.informationRepository.SaveChanges();
+        }
     }
 
-    private void RemoveIteration(object obj)
+    private void RemoveAndSaveIteration(object obj)
     {
         if (obj is not Iteration iteration)
         {
@@ -117,12 +118,14 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         foreach (var iterationToUpdate in this.Iterations)
         {
             iterationToUpdate.ColumnPosition = this.Iterations.IndexOf(iterationToUpdate);
+            iterationToUpdate.IterationNumber = this.Iterations.IndexOf(iterationToUpdate) + 1;
         }
         foreach (var iterationFeatureSlot in this.IterationFeatureSlots.ToList())
         {
             if (iterationFeatureSlot.ParentIterationId == iteration.Id)
             {
                 this.IterationFeatureSlots.Remove(iterationFeatureSlot);
+                this.informationRepository.ApplicationInformation.IterationFeatureSlots.Remove(iterationFeatureSlot);
                 continue;
             }
             iterationFeatureSlot.ColumnPosition = this.Iterations.Single(iteration => iteration.Id == iterationFeatureSlot.ParentIterationId).ColumnPosition;
@@ -133,9 +136,12 @@ internal class MainWindowViewModel : INotifyPropertyChanged
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots.Count)));
+
+        this.informationRepository.ApplicationInformation.Iterations.Remove(iteration);
+        this.informationRepository.SaveChanges();
     }
 
-    private void RemoveFeature(object obj)
+    private void RemoveAndSaveFeature(object obj)
     {
         if (obj is not Feature feature)
         {
@@ -146,11 +152,12 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         {
             featureToUpdate.RowPosition = this.Features.IndexOf(featureToUpdate);
         }
-        foreach (var iterationFeatureSlot in this.IterationFeatureSlots)
+        foreach (var iterationFeatureSlot in this.IterationFeatureSlots.ToList())
         {
             if (iterationFeatureSlot.ParentFeatureId == feature.Id)
             {
                 this.IterationFeatureSlots.Remove(iterationFeatureSlot);
+                this.informationRepository.ApplicationInformation.IterationFeatureSlots.Remove(iterationFeatureSlot);
                 continue;
             }
             iterationFeatureSlot.RowPosition = this.Features.Single(feature => feature.Id == iterationFeatureSlot.ParentFeatureId).RowPosition;
@@ -161,9 +168,12 @@ internal class MainWindowViewModel : INotifyPropertyChanged
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots.Count)));
+
+        this.informationRepository.ApplicationInformation.Features.Remove(feature);
+        this.informationRepository.SaveChanges();
     }
 
-    private void RemoveUserStory(object obj)
+    private void RemoveAndSaveUserStory(object obj)
     {
         if (obj is not UserStory userStory)
         {
@@ -172,6 +182,7 @@ internal class MainWindowViewModel : INotifyPropertyChanged
 
         var iterationFeatureSlot = this.IterationFeatureSlots.First(iteration => iteration.UserStories.Contains(userStory));
         iterationFeatureSlot.RemoveUserStory(userStory);
+        this.informationRepository.SaveChanges();
     }
 
     private void ClearOtherItemsInEdition(object obj)
@@ -203,7 +214,7 @@ internal class MainWindowViewModel : INotifyPropertyChanged
             }
     }
 
-    private void AddNewFeature()
+    private void AddAndSaveNewFeature()
     {
         var featureToAdd = new Feature
         {
@@ -212,6 +223,49 @@ internal class MainWindowViewModel : INotifyPropertyChanged
             Title = "Feature Title",
             FeatureType = FeatureTypes.Feature
         };
+
+        this.AddNewFeature(featureToAdd);
+        this.informationRepository.ApplicationInformation.Features.Add(featureToAdd);
+        this.informationRepository.ApplicationInformation.IterationFeatureSlots = this.IterationFeatureSlots.ToList();
+
+        this.informationRepository.SaveChanges();
+    }
+
+    private void AddAndSaveNewIteration()
+    {
+        var iterationToAdd = new Iteration
+        {
+            Id = Guid.NewGuid(),
+            ColumnPosition = this.Iterations.Count,
+            IterationNumber = this.Iterations.Count + 1
+        };
+
+        this.AddNewIteration(iterationToAdd);
+        this.informationRepository.ApplicationInformation.Iterations.Add(iterationToAdd);
+        this.informationRepository.ApplicationInformation.IterationFeatureSlots = this.IterationFeatureSlots.ToList();
+
+        this.informationRepository.SaveChanges();
+    }
+
+    private void AddAndSaveNewUserStory(object obj)
+    {
+        if (obj is not IterationFeatureSlot iterationFeatureSlot)
+        {
+            return;
+        }
+
+        var userStoryToAdd = new UserStory
+        {
+            Title = "User story"
+        };
+
+        iterationFeatureSlot.AddNewUserStory(userStoryToAdd);
+
+        this.informationRepository.SaveChanges();
+    }
+
+    private void AddNewFeature(Feature featureToAdd)
+    {
         this.Features.Add(featureToAdd);
 
         foreach (var iteration in this.Iterations)
@@ -233,13 +287,8 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots.Count)));
     }
 
-    private void AddNewIteration()
+    private void AddNewIteration(Iteration iterationToAdd)
     {
-        var iterationToAdd = new Iteration
-        {
-            Id = Guid.NewGuid(),
-            ColumnPosition = this.Iterations.Count
-        };
         this.Iterations.Add(iterationToAdd);
 
         foreach (var feature in this.Features)
@@ -261,13 +310,8 @@ internal class MainWindowViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationFeatureSlots.Count)));
     }
 
-    private void AddNewUserStory(object obj)
+    public void SaveChanges()
     {
-        if (obj is not IterationFeatureSlot iterationFeatureSlot)
-        {
-            return;
-        }
-
-        iterationFeatureSlot.AddNewUserStory(new UserStory { Title = $"User story {iterationFeatureSlot.RowPosition}.{iterationFeatureSlot.ColumnPosition}.{iterationFeatureSlot.UserStories.Count}" });
+        this.informationRepository.SaveChanges();
     }
 }
