@@ -1,36 +1,30 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Data;
 
 using PiPlanningApp.Models;
 
-namespace PiPlanningApp.Converters
-{
-    internal class FeaturesIterationsUserStoriesToGridElementMultiConverter : IMultiValueConverter
-    {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (values.Length == 3 &&
-                values[0] is ObservableCollection<Feature> features &&
-                values[1] is ObservableCollection<Iteration> iterations && 
-                values[2] is ObservableCollection<IterationFeatureSlot> iterationFeatureSlots)
-            { 
-                var compositeCollection = new CompositeCollection
-                {
-                    new CollectionContainer { Collection = features },
-                    new CollectionContainer { Collection = iterations },
-                    new CollectionContainer { Collection = iterationFeatureSlots},
-                };
-                return compositeCollection;
-            }
-            return null;
-        }
+namespace PiPlanningApp.Converters;
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+internal class FeaturesIterationsUserStoriesToGridElementMultiConverter : IMultiValueConverter
+{
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (values is not null)
         {
-            throw new NotImplementedException();
+            var compositeCollection = new CompositeCollection();
+            values.OfType<IList>().ToList().ForEach(x => compositeCollection.Add(new CollectionContainer { Collection = x }));
+            return compositeCollection;
         }
+        return null;
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
     }
 }
