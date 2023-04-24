@@ -234,10 +234,56 @@
             </datatemplateselectors:GridElementDataTemplateSelector.FeatureTemplate>
             <datatemplateselectors:GridElementDataTemplateSelector.IterationTemplate>
                 <DataTemplate DataType="models:Iteration">
-                    <Grid Background="LightGray" Margin="3" MinWidth="200" MaxWidth="300" Height="150">
+                    <Grid
+                        Height="150"
+                        MinWidth="200"
+                        Margin="3"
+                        Background="LightGray">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.Triggers>
+                            <EventTrigger RoutedEvent="MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard TargetProperty="Visibility" TargetName="EditIterationButton">
+                                        <ObjectAnimationUsingKeyFrames>
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseLeave">
+                                <BeginStoryboard>
+                                    <Storyboard TargetProperty="Visibility" TargetName="EditIterationButton">
+                                        <ObjectAnimationUsingKeyFrames>
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Grid.Triggers>
                         <Grid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Delete iteration">
+                                    <MenuItem.Icon>
+                                        <Image Source="{StaticResource RemoveSvgIcon}" />
+                                    </MenuItem.Icon>
                                     <MenuItem.Style>
                                         <Style TargetType="MenuItem">
                                             <Setter Property="Command" Value="{Binding Source={x:Reference Name=PIPlanningMainWindow}, Path=DataContext.DeleteIterationCommand}" />
@@ -247,7 +293,151 @@
                                 </MenuItem>
                             </ContextMenu>
                         </Grid.ContextMenu>
-                        <TextBlock Text="{Binding Converter={StaticResource IterationTitleConverter}}" />
+                        <WrapPanel Grid.ColumnSpan="2" HorizontalAlignment="Center">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="{StaticResource Level1FontSize}"
+                                FontWeight="Bold"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource IterationTitleMultiConverter}">
+                                        <Binding Path="IterationName" />
+                                        <Binding Path="IterationNumber" />
+                                    </MultiBinding>
+                                </TextBlock.Text></TextBlock>
+                            <TextBox
+                                MinWidth="30"
+                                HorizontalAlignment="Center"
+                                FontSize="{StaticResource Level1FontSize}"
+                                FontWeight="Bold"
+                                Text="{Binding IterationName}"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="{StaticResource Level1FontSize}"
+                                FontWeight="Bold"
+                                Text="Iteration"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
+                        </WrapPanel>
+                        <WrapPanel Grid.Row="1">
+                            <TextBlock
+                                Margin="10,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="Total Capacity:" />
+                            <TextBlock
+                                Margin="5,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="{Binding TotalCapacity}"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
+                            <controls:DecimalNumericTextbox
+                                Margin="5,5,0,5"
+                                VerticalAlignment="Top"
+                                VerticalContentAlignment="Center"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Style="{StaticResource PlainTextBox}"
+                                Text="{Binding TotalCapacity}"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
+                            <TextBlock
+                                Margin="5,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="SP"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
+                        </WrapPanel>
+                        <WrapPanel Grid.Row="2">
+                            <TextBlock
+                                Margin="10,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="Current:" />
+                            <TextBlock
+                                Margin="5,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="{Binding LoadCapacity}" />
+                            <TextBlock
+                                Margin="5,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="SP" />
+                        </WrapPanel>
+                        <Border
+                            Grid.Row="2"
+                            BorderBrush="Firebrick"
+                            Margin="5, 0"
+                            BorderThickness="0,0,0,3">
+                            <Border.Visibility>
+                                <MultiBinding Converter="{StaticResource IntegerGreaterThanOrEqualToOtherVisibilityMultiConverter}">
+                                    <Binding Path="TotalCapacity" />
+                                    <Binding Path="LoadCapacity" />
+                                </MultiBinding>
+                            </Border.Visibility>
+                        </Border>
+                        <WrapPanel Grid.Row="1" Grid.Column="1">
+                            <TextBlock
+                                Margin="10,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="Support days:" />
+                            <TextBlock
+                                Margin="5,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="{Binding SupportDays}"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
+                            <controls:IntegerNumericTextbox
+                                Width="20"
+                                Margin="5,5,0,5"
+                                VerticalAlignment="Top"
+                                VerticalContentAlignment="Center"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Style="{StaticResource PlainTextBox}"
+                                Text="{Binding SupportDays}"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
+                        </WrapPanel>
+                        <WrapPanel Grid.Row="2" Grid.Column="2">
+                            <TextBlock
+                                Margin="10,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="Defect days:" />
+                            <TextBlock
+                                Margin="5,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="{Binding DefectDays}"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
+                            <controls:IntegerNumericTextbox
+                                Width="20"
+                                Margin="5,5,0,5"
+                                VerticalAlignment="Top"
+                                VerticalContentAlignment="Center"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Style="{StaticResource PlainTextBox}"
+                                Text="{Binding DefectDays}"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
+                        </WrapPanel>
+                        <Button
+                            x:Name="EditIterationButton"
+                            Grid.RowSpan="2"
+                            Grid.Column="2"
+                            Width="30"
+                            Height="30"
+                            Margin="3"
+                            Padding="3"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Command="{Binding EditIterationCommand, ElementName=MainWindowViewModel}"
+                            CommandParameter="{Binding}"
+                            ToolTip="Add new user story"
+                            Visibility="Collapsed">
+                            <Image>
+                                <Image.Style>
+                                    <Style TargetType="Image">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEditing}" Value="False">
+                                                <Setter Property="Source" Value="{StaticResource EditSvgIcon}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                <Setter Property="Source" Value="{StaticResource ConfirmSvgIcon}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+                        </Button>
                     </Grid>
                 </DataTemplate>
             </datatemplateselectors:GridElementDataTemplateSelector.IterationTemplate>
