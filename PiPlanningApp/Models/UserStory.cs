@@ -1,13 +1,14 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+
+using Newtonsoft.Json;
 
 namespace PiPlanningApp.Models;
 
-internal class UserStory : INotifyPropertyChanged
+public class UserStory : INotifyPropertyChanged
 {
     private string title;
     private bool isEditing;
-    private double storyPoints;
+    private decimal storyPoints;
 
     public string Title
     {
@@ -19,16 +20,18 @@ internal class UserStory : INotifyPropertyChanged
         }
     }
 
+    [JsonIgnore]
     public bool IsEditing
     {
-        get => this.isEditing; set
+        get => this.isEditing;
+        set
         {
             this.isEditing = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IsEditing)));
         }
     }
 
-    public double StoryPoints
+    public decimal StoryPoints
     {
         get => this.storyPoints;
         set
@@ -37,8 +40,6 @@ internal class UserStory : INotifyPropertyChanged
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.StoryPoints)));
         }
     }
-
-
 
     public event PropertyChangedEventHandler PropertyChanged;
 }

@@ -1,18 +1,20 @@
 ﻿using System;
 using System.ComponentModel;
 
+using Newtonsoft.Json;
+
 using PiPlanningApp.Types;
 
 namespace PiPlanningApp.Models;
 
-internal class Feature : INotifyPropertyChanged
+public class Feature : INotifyPropertyChanged
 {
     private int rowPosition;
     private Guid id;
     private string title;
     private bool isEditing;
     private FeatureTypes featureType;
-    private double totalStoryPoints;
+    private decimal totalStoryPoints;
     private int featureNumber;
 
     public Guid Id
@@ -24,6 +26,8 @@ internal class Feature : INotifyPropertyChanged
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Id)));
         }
     }
+
+    public int ColumnPosition => -1;
 
     public int RowPosition
     {
@@ -45,9 +49,11 @@ internal class Feature : INotifyPropertyChanged
         }
     }
 
+    [JsonIgnore]
     public bool IsEditing
     {
-        get => this.isEditing; set
+        get => this.isEditing;
+        set
         {
             this.isEditing = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IsEditing)));
@@ -64,7 +70,7 @@ internal class Feature : INotifyPropertyChanged
         }
     }
 
-    public double TotalStoryPoints
+    public decimal TotalStoryPoints
     {
         get => this.totalStoryPoints;
         set
@@ -83,7 +89,6 @@ internal class Feature : INotifyPropertyChanged
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.FeatureNumber)));
         }
     }
-
 
     public event PropertyChangedEventHandler PropertyChanged;
 }

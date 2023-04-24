@@ -1,19 +1,22 @@
 ﻿using System;
 using System.ComponentModel;
 
+using Newtonsoft.Json;
+
 namespace PiPlanningApp.Models;
 
-internal class Iteration : INotifyPropertyChanged
+public class Iteration : INotifyPropertyChanged
 {
     private Guid id;
     private int columnPosition;
     private string iterationName;
     private bool isEditing;
-    private double totalCapacity;
-    private double loadCapacity;
+    private decimal totalCapacity;
+    private decimal loadCapacity;
     private int supportDays;
     private int defectDays;
     private int unplannedDays;
+    private int iterationNumber;
 
     public Guid Id
     {
@@ -35,6 +38,8 @@ internal class Iteration : INotifyPropertyChanged
         }
     }
 
+    public int RowPosition => -1;
+
     public string IterationName
     {
         get => this.iterationName;
@@ -45,16 +50,18 @@ internal class Iteration : INotifyPropertyChanged
         }
     }
 
+    [JsonIgnore]
     public bool IsEditing
     {
-        get => this.isEditing; set
+        get => this.isEditing;
+        set
         {
             this.isEditing = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IsEditing)));
         }
     }
 
-    public double TotalCapacity
+    public decimal TotalCapacity
     {
         get => this.totalCapacity;
         set
@@ -64,7 +71,7 @@ internal class Iteration : INotifyPropertyChanged
         }
     }
 
-    public double LoadCapacity
+    public decimal LoadCapacity
     {
         get => this.loadCapacity;
         set
@@ -93,7 +100,7 @@ internal class Iteration : INotifyPropertyChanged
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.DefectDays)));
         }
     }
-    
+
     public int UnplannedDays
     {
         get => this.unplannedDays;
@@ -101,6 +108,16 @@ internal class Iteration : INotifyPropertyChanged
         {
             this.unplannedDays = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.UnplannedDays)));
+        }
+    }
+
+    public int IterationNumber
+    {
+        get => iterationNumber;
+        set
+        {
+            iterationNumber = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IterationNumber)));
         }
     }
 
