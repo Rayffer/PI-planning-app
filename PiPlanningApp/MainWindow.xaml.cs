@@ -27,18 +27,29 @@ public partial class MainWindow : Window
         {
             var slotToDragFrom = mainWindowViewModel.IterationFeatureSlots.First(slot => slot.UserStories.Contains(userStoryToMove));
 
-            DragDrop.DoDragDrop(gridElement, userStoryToMove, DragDropEffects.Move);
+            var result = DragDrop.DoDragDrop(gridElement, userStoryToMove, DragDropEffects.Move);
+            if (result == DragDropEffects.None)
+            {
+                e.Handled = true;
+                return;
+            }
             slotToDragFrom.RemoveUserStory(userStoryToMove);
 
-            var previousParentIteration = mainWindowViewModel.Iterations.First(x => x.Id == slotToDragFrom.ParentIterationId);
-            var previousParentFeature = mainWindowViewModel.Features.First(x => x.Id == slotToDragFrom.ParentFeatureId);
+            var previousParentIteration =
+                mainWindowViewModel.Iterations.First(x => x.Id == slotToDragFrom.ParentIterationId);
+            var previousParentFeature =
+                mainWindowViewModel.Features.First(x => x.Id == slotToDragFrom.ParentFeatureId);
 
-            previousParentIteration.LoadCapacity = mainWindowViewModel.IterationFeatureSlots.Where(x => x.ParentIterationId == previousParentIteration.Id)
+            previousParentIteration.LoadCapacity =
+                mainWindowViewModel.IterationFeatureSlots.Where(x => x.ParentIterationId == previousParentIteration.Id)
                                                                                             .Sum(x => x.UserStories.Sum(y => y.StoryPoints));
-            previousParentFeature.TotalStoryPoints = mainWindowViewModel.IterationFeatureSlots.Where(x => x.ParentFeatureId == previousParentFeature.Id)
+            previousParentFeature.TotalStoryPoints =
+                mainWindowViewModel.IterationFeatureSlots.Where(x => x.ParentFeatureId == previousParentFeature.Id)
                                                                                               .Sum(x => x.UserStories.Sum(y => y.StoryPoints));
 
             mainWindowViewModel.SaveChanges();
+
+            e.Handled = true;
         }
     }
 
