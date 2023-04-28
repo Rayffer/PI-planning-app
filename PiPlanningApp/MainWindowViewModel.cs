@@ -124,7 +124,7 @@ internal partial class MainWindowViewModel : ObservableObject
         this.informationRepository.SaveChanges();
     }
 
-    private bool CanExecuteRemoveAndSaveIteration() => this.Features.Count > 1;
+    private bool CanExecuteRemoveAndSaveIteration() => this.Iterations.Count > 1;
 
     [RelayCommand(CanExecute = nameof(CanExecuteRemoveAndSaveFeature))]
     private void RemoveAndSaveFeature(object obj)
