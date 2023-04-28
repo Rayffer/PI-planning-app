@@ -151,10 +151,12 @@ public partial class MainWindow : Window
             e.Handled = true;
             return;
         }
+
         var currentPosition = e.GetPosition(this);
         this.MainGridTranslateTransform.X += (currentPosition.X - this.previousPosition.X);
         this.MainGridTranslateTransform.Y += (currentPosition.Y - this.previousPosition.Y) * 2;
-        this.previousPosition = e.GetPosition(this);
+
+        this.previousPosition = currentPosition;
         if (this.MainGridTranslateTransform.X < (-(this.MainGrid.ActualWidth - this.ActualWidth) - this.margin))
         {
             this.MainGridTranslateTransform.X = (-(this.MainGrid.ActualWidth - this.ActualWidth)  - this.margin) ;

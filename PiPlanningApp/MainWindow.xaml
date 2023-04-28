@@ -230,7 +230,7 @@
                 <DataTemplate DataType="models:Iteration">
                     <Grid
                         Height="150"
-                        MinWidth="200"
+                        MinWidth="250"
                         Margin="3"
                         Background="LightGray">
                         <Grid.ColumnDefinitions>
@@ -445,7 +445,7 @@
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <Grid Margin="15,10" local:GridHelpers.ColumnCount="2"
-                                                         local:GridHelpers.RowCount="{Binding UserStories.Count, Converter={StaticResource FloatDivideCeilingRoundingConverter}, ConverterParameter=2}"/>
+                                                         local:GridHelpers.RowCount="{Binding UserStories.Count, Converter={StaticResource FloatDivideCeilingRoundingConverter}, ConverterParameter=2}" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
