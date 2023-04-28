@@ -451,7 +451,6 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid
-                                        Height="150"
                                         Width="200"
                                         MinHeight="150"
                                         Margin="3"
@@ -606,8 +605,8 @@
     <Window.DataContext>
         <local:MainWindowViewModel x:Name="MainWindowViewModel" />
     </Window.DataContext>
-    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-        <Grid SelectiveScrollingGrid.SelectiveScrollingOrientation="Both">
+    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" CanContentScroll="False" PreviewMouseWheel="ScrollViewer_MouseWheel" MouseMove="ScrollViewer_MouseMove">
+        <Grid x:Name="MainGrid" SelectiveScrollingGrid.SelectiveScrollingOrientation="Both">
             <Grid.RowDefinitions>
                 <RowDefinition Height="156" MaxHeight="156" />
                 <RowDefinition />
@@ -616,6 +615,12 @@
                 <ColumnDefinition Width="306" MaxWidth="306" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
+            <Grid.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform x:Name="MainGridTranslateTransform" />
+                    <ScaleTransform x:Name="MainGridScaleTransform" />
+                </TransformGroup>
+            </Grid.RenderTransform>
             <Polygon Margin="3" Fill="CadetBlue">
                 <Polygon.Points>
                     <Point X="0" Y="3" />
@@ -630,6 +635,7 @@
                     <Point X="300" Y="0" />
                 </Polygon.Points>
             </Polygon>
+            <Button Content="Send To azure" VerticalAlignment="Top" HorizontalAlignment="Left" />
             <Button
                     Width="25"
                     Height="25"
