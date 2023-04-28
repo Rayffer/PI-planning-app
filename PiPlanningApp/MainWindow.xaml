@@ -28,6 +28,9 @@
         <converters:StringIsNotNullOrEmptyVisibilityConverter x:Key="StringIsNotNullOrEmptyVisibilityConverter" />
         <converters:StringIsNullOrEmptyVisibilityConverter x:Key="StringIsNullOrEmptyVisibilityConverter" />
         <converters:IntegerGreaterThanOrEqualToOtherVisibilityMultiConverter x:Key="IntegerGreaterThanOrEqualToOtherVisibilityMultiConverter" />
+        <converters:IntegerModuloConverter x:Key="IntegerModuloConverter" />
+        <converters:IntegerDivideConverter x:Key="IntegerDivideConverter" />
+        <converters:FloatDivideCeilingRoundingConverter x:Key="FloatDivideCeilingRoundingConverter" />
         <ContextMenu x:Key="FeatureContextMenu" />
         <ObjectDataProvider
             x:Key="FeatureTypesEnum"
@@ -441,7 +444,8 @@
                         <ItemsControl AlternationCount="{x:Static sys:Int32.MaxValue}" ItemsSource="{Binding UserStories}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <Grid Margin="15,10" local:GridHelpers.RowCount="{Binding UserStories.Count}" />
+                                    <Grid Margin="15,10" local:GridHelpers.ColumnCount="2"
+                                                         local:GridHelpers.RowCount="{Binding UserStories.Count, Converter={StaticResource FloatDivideCeilingRoundingConverter}, ConverterParameter=2}"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
@@ -449,6 +453,7 @@
                                     <Grid
                                         Height="150"
                                         Width="200"
+                                        MinHeight="150"
                                         Margin="3"
                                         Background="Gold"
                                         MouseMove="Grid_MouseMove">
@@ -573,7 +578,8 @@
                             </ItemsControl.ItemTemplate>
                             <ItemsControl.ItemContainerStyle>
                                 <Style TargetType="ContentPresenter">
-                                    <Setter Property="Grid.Row" Value="{Binding RelativeSource={RelativeSource Self}, Path=(ItemsControl.AlternationIndex)}" />
+                                    <Setter Property="Grid.Column" Value="{Binding RelativeSource={RelativeSource Self}, Path=(ItemsControl.AlternationIndex), Converter={StaticResource IntegerModuloConverter}, ConverterParameter=2}" />
+                                    <Setter Property="Grid.Row" Value="{Binding RelativeSource={RelativeSource Self}, Path=(ItemsControl.AlternationIndex), Converter={StaticResource IntegerDivideConverter}, ConverterParameter=2}" />
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
                         </ItemsControl>
