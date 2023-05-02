@@ -16,6 +16,18 @@ internal partial class MainWindowViewModel : ObservableObject
 {
     private readonly IInformationRepository informationRepository;
 
+    [ObservableProperty]
+    private double scaleX;
+
+    [ObservableProperty]
+    private double scaleY;
+
+    [ObservableProperty]
+    private double offsetX;
+
+    [ObservableProperty]
+    private double offsetY;
+
     public ObservableCollection<Iteration> Iterations { get; set; } = new();
     public ObservableCollection<Feature> Features { get; set; } = new();
     public ObservableCollection<IterationFeatureSlot> IterationFeatureSlots { get; set; } = new();
@@ -172,6 +184,25 @@ internal partial class MainWindowViewModel : ObservableObject
         var iterationFeatureSlot = this.IterationFeatureSlots.First(iteration => iteration.UserStories.Contains(userStory));
         iterationFeatureSlot.RemoveUserStory(userStory);
         this.informationRepository.SaveChanges();
+    }
+
+    [RelayCommand]
+    private void SendToAzure()
+    {
+    }
+
+    [RelayCommand]
+    private void RestoreZoom()
+    {
+        this.ScaleX = 1.0;
+        this.ScaleY = 1.0;
+    }
+
+    [RelayCommand]
+    private void ReturnToOrigin()
+    {
+        this.OffsetX = 0;
+        this.OffsetY = 0;
     }
 
     private void ClearOtherItemsInEdition(object obj)

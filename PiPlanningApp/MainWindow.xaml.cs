@@ -86,21 +86,40 @@ public partial class MainWindow : Window
                 this.MainGridScaleTransform.ScaleY >= 0.1 &&
                 this.MainGridScaleTransform.ScaleY <= 4)
             {
-                this.MainGridScaleTransform.ScaleX += e.Delta / 1200D;
-                this.MainGridScaleTransform.ScaleY += e.Delta / 1200D;
+                var previousScaleX = this.MainGridScaleTransform.ScaleX;
+                var previousScaleY = this.MainGridScaleTransform.ScaleX;
 
-                this.MainGridScaleTransform.ScaleX = this.MainGridScaleTransform.ScaleX switch
+                var modifiedScaleX = previousScaleX + e.Delta / 1200D;
+                var modifiedScaleY = previousScaleY + e.Delta / 1200D;
+                modifiedScaleX = modifiedScaleX switch
                 {
-                    < 0.1 => 0.1,
+                    < 0.3 => 0.3,
                     > 4.0 => 4.0,
-                    _ => this.MainGridScaleTransform.ScaleX
+                    _ => modifiedScaleX
                 };
-                this.MainGridScaleTransform.ScaleY = this.MainGridScaleTransform.ScaleY switch
+                modifiedScaleY = modifiedScaleY switch
                 {
-                    < 0.1 => 0.1,
+                    < 0.3 => 0.3,
                     > 4.0 => 4.0,
-                    _ => this.MainGridScaleTransform.ScaleY
+                    _ => modifiedScaleY
                 };
+
+                if (previousScaleX == modifiedScaleX && previousScaleY == modifiedScaleY)
+                {
+                    e.Handled = true;
+                    return;
+                }
+
+                //var mouseMainGridPosition = e.GetPosition(this.MainGrid);
+                //var mouseMainWindowPosition = e.GetPosition(sender as ScrollViewer);
+
+                //this.MainGridScaleTransform.CenterX = mouseMainGridPosition.X - this.MainGrid.ActualWidth / 2;
+                //this.MainGridScaleTransform.CenterY = mouseMainGridPosition.Y - this.MainGrid.ActualHeight / 2;
+                this.MainGridScaleTransform.ScaleX = modifiedScaleX;
+                this.MainGridScaleTransform.ScaleY = modifiedScaleY;
+
+                //this.MainGridTranslateTransform.X = (this.MainGridTranslateTransform.X - this.MainGrid.ActualWidth / 2) * modifiedScaleX / previousScaleX;
+                //this.MainGridTranslateTransform.Y = (this.MainGridTranslateTransform.Y - this.MainGrid.ActualHeight / 2) * modifiedScaleY / previousScaleY;
             }
         }
         else
@@ -108,34 +127,16 @@ public partial class MainWindow : Window
             if (Keyboard.Modifiers == ModifierKeys.Shift)
             {
                 this.MainGridTranslateTransform.X += e.Delta;
-
-                if (this.MainGridTranslateTransform.X < (-(this.MainGrid.ActualWidth - this.ActualWidth) - this.margin))
-                {
-                    this.MainGridTranslateTransform.X = (-(this.MainGrid.ActualWidth - this.ActualWidth) - this.margin);
-                }
-                if (this.MainGridTranslateTransform.X > this.margin)
-                {
-                    this.MainGridTranslateTransform.X = this.margin;
-                }
             }
             else
             {
                 this.MainGridTranslateTransform.Y += e.Delta;
-                if (this.MainGridTranslateTransform.Y < (-(this.MainGrid.ActualHeight - this.ActualHeight) - this.margin))
-                {
-                    this.MainGridTranslateTransform.Y = (-(this.MainGrid.ActualHeight - this.ActualHeight) - this.margin);
-                }
-                if (this.MainGridTranslateTransform.Y > this.margin)
-                {
-                    this.MainGridTranslateTransform.Y = this.margin;
-                }
             }
         }
         e.Handled = true;
     }
 
     private Point previousPosition;
-    private double margin = 200;
 
     private void ScrollViewer_MouseMove(object sender, MouseEventArgs e)
     {
@@ -153,25 +154,9 @@ public partial class MainWindow : Window
         }
 
         var currentPosition = e.GetPosition(this);
-        this.MainGridTranslateTransform.X += (currentPosition.X - this.previousPosition.X);
-        this.MainGridTranslateTransform.Y += (currentPosition.Y - this.previousPosition.Y) * 2;
+        this.MainGridTranslateTransform.X += (currentPosition.X - this.previousPosition.X) / this.MainGridScaleTransform.ScaleX;
+        this.MainGridTranslateTransform.Y += (currentPosition.Y - this.previousPosition.Y) / this.MainGridScaleTransform.ScaleY;
 
         this.previousPosition = currentPosition;
-        if (this.MainGridTranslateTransform.X < (-(this.MainGrid.ActualWidth - this.ActualWidth) - this.margin))
-        {
-            this.MainGridTranslateTransform.X = (-(this.MainGrid.ActualWidth - this.ActualWidth)  - this.margin) ;
-        }
-        if (this.MainGridTranslateTransform.X > this.margin)
-        {
-            this.MainGridTranslateTransform.X = this.margin;
-        }
-        if (this.MainGridTranslateTransform.Y < (-(this.MainGrid.ActualHeight - this.ActualHeight) - this.margin))
-        {
-            this.MainGridTranslateTransform.Y = (-(this.MainGrid.ActualHeight - this.ActualHeight) - this.margin) ;
-        }
-        if (this.MainGridTranslateTransform.Y > this.margin)
-        {
-            this.MainGridTranslateTransform.Y = this.margin;
-        }
     }
 }
