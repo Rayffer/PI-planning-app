@@ -79,6 +79,11 @@ public partial class MainWindow : Window
 
     private void ScrollViewer_MouseWheel(object sender, MouseWheelEventArgs e)
     {
+        if (this.DataContext is not MainWindowViewModel mainWindowViewModel)
+        {
+            e.Handled = true;
+            return;
+        }
         if (Keyboard.Modifiers == ModifierKeys.Control)
         {
             if (this.MainGridScaleTransform.ScaleX >= 0.1 &&
@@ -115,22 +120,21 @@ public partial class MainWindow : Window
 
                 //this.MainGridScaleTransform.CenterX = mouseMainGridPosition.X - this.MainGrid.ActualWidth / 2;
                 //this.MainGridScaleTransform.CenterY = mouseMainGridPosition.Y - this.MainGrid.ActualHeight / 2;
-                this.MainGridScaleTransform.ScaleX = modifiedScaleX;
-                this.MainGridScaleTransform.ScaleY = modifiedScaleY;
 
                 //this.MainGridTranslateTransform.X = (this.MainGridTranslateTransform.X - this.MainGrid.ActualWidth / 2) * modifiedScaleX / previousScaleX;
                 //this.MainGridTranslateTransform.Y = (this.MainGridTranslateTransform.Y - this.MainGrid.ActualHeight / 2) * modifiedScaleY / previousScaleY;
+                mainWindowViewModel.SetScale(modifiedScaleX, modifiedScaleY);
             }
         }
         else
         {
             if (Keyboard.Modifiers == ModifierKeys.Shift)
             {
-                this.MainGridTranslateTransform.X += e.Delta;
+                mainWindowViewModel.SetTranslateOffset(this.MainGridTranslateTransform.X + e.Delta, this.MainGridTranslateTransform.Y);
             }
             else
             {
-                this.MainGridTranslateTransform.Y += e.Delta;
+                mainWindowViewModel.SetTranslateOffset(this.MainGridTranslateTransform.X, this.MainGridTranslateTransform.Y + e.Delta);
             }
         }
         e.Handled = true;
@@ -140,6 +144,11 @@ public partial class MainWindow : Window
 
     private void ScrollViewer_MouseMove(object sender, MouseEventArgs e)
     {
+        if (this.DataContext is not MainWindowViewModel mainWindowViewModel)
+        {
+            e.Handled = true;
+            return;
+        }
         if (Mouse.MiddleButton != MouseButtonState.Pressed)
         {
             e.Handled = true;
@@ -154,8 +163,9 @@ public partial class MainWindow : Window
         }
 
         var currentPosition = e.GetPosition(this);
-        this.MainGridTranslateTransform.X += (currentPosition.X - this.previousPosition.X) / this.MainGridScaleTransform.ScaleX;
-        this.MainGridTranslateTransform.Y += (currentPosition.Y - this.previousPosition.Y) / this.MainGridScaleTransform.ScaleY;
+        this.MainWindowViewModel.SetTranslateOffset(
+            this.MainGridTranslateTransform.X + (currentPosition.X - this.previousPosition.X) / this.MainGridScaleTransform.ScaleX,
+            this.MainGridTranslateTransform.Y + (currentPosition.Y - this.previousPosition.Y) / this.MainGridScaleTransform.ScaleY);
 
         this.previousPosition = currentPosition;
     }

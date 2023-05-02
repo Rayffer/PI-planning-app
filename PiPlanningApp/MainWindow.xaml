@@ -618,8 +618,8 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RenderTransform>
                     <TransformGroup>
-                        <TranslateTransform x:Name="MainGridTranslateTransform" />
-                        <ScaleTransform x:Name="MainGridScaleTransform" />
+                        <TranslateTransform x:Name="MainGridTranslateTransform" X="{Binding OffsetX}" Y="{Binding OffsetY}" />
+                        <ScaleTransform x:Name="MainGridScaleTransform" ScaleX="{Binding ScaleX}" ScaleY="{Binding ScaleY}" />
                     </TransformGroup>
                 </Grid.RenderTransform>
                 <Polygon Margin="3" Fill="CadetBlue">

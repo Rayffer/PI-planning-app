@@ -17,10 +17,10 @@ internal partial class MainWindowViewModel : ObservableObject
     private readonly IInformationRepository informationRepository;
 
     [ObservableProperty]
-    private double scaleX;
+    private double scaleX = 1.0;
 
     [ObservableProperty]
-    private double scaleY;
+    private double scaleY = 1.0;
 
     [ObservableProperty]
     private double offsetX;
@@ -331,6 +331,18 @@ internal partial class MainWindowViewModel : ObservableObject
 
         this.OnPropertyChanged(nameof(this.IterationFeatureSlots));
         this.OnPropertyChanged(nameof(this.IterationFeatureSlots.Count));
+    }
+
+    internal void SetScale(double modifiedScaleX, double modifiedScaleY)
+    {
+        this.ScaleX = modifiedScaleX;
+        this.ScaleY = modifiedScaleY;
+    }
+
+    internal void SetTranslateOffset(double offsetX, double offsetY)
+    {
+        this.OffsetX = offsetX;
+        this.OffsetY = offsetY;
     }
 
     public void SaveChanges()
