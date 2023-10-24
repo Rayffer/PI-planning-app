@@ -1,14 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Linq;
+using System.Windows.Documents;
+using System.Windows.Input;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using Newtonsoft.Json;
+
 using PiPlanningApp.Models;
 using PiPlanningApp.Repositories;
 using PiPlanningApp.Types;
+
+using RestSharp;
 
 namespace PiPlanningApp;
 
@@ -28,6 +35,12 @@ internal partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private double offsetY;
 
+    [ObservableProperty]
+    private List<string> azureIterations;
+
+
+    private readonly  RestClient client;
+
     public ObservableCollection<Iteration> Iterations { get; set; } = new();
     public ObservableCollection<Feature> Features { get; set; } = new();
     public ObservableCollection<IterationFeatureSlot> IterationFeatureSlots { get; set; } = new();
@@ -45,6 +58,8 @@ internal partial class MainWindowViewModel : ObservableObject
         this.informationRepository.ApplicationInformation.Iterations.ForEach(this.AddNewIteration);
         this.IterationFeatureSlots.Clear();
         this.informationRepository.ApplicationInformation.IterationFeatureSlots.ForEach(this.IterationFeatureSlots.Add);
+
+        this.client = new RestClient("https://dev.azure.com/");
     }
 
     [RelayCommand]
@@ -54,6 +69,7 @@ internal partial class MainWindowViewModel : ObservableObject
         {
             return;
         }
+
         this.ClearOtherItemsInEdition(obj);
 
         userStoryToEdit.IsEditing = !userStoryToEdit.IsEditing;
@@ -63,6 +79,7 @@ internal partial class MainWindowViewModel : ObservableObject
             var parentIteration = this.Iterations.First(x => x.Id == featureIterationSlot.ParentIterationId);
             var parentFeature = this.Features.First(x => x.Id == featureIterationSlot.ParentFeatureId);
 
+            parentIteration.ReservationDays = this.IterationFeatureSlots.Where(x => x.ParentIterationId == parentIteration.Id).Sum(x => x.UserStories.Sum(y => y.Days));
             parentIteration.LoadCapacity = this.IterationFeatureSlots.Where(x => x.ParentIterationId == parentIteration.Id).Sum(x => x.UserStories.Sum(y => y.StoryPoints));
             parentFeature.TotalStoryPoints = this.IterationFeatureSlots.Where(x => x.ParentFeatureId == parentFeature.Id).Sum(x => x.UserStories.Sum(y => y.StoryPoints));
 
@@ -182,13 +199,54 @@ internal partial class MainWindowViewModel : ObservableObject
         }
 
         var iterationFeatureSlot = this.IterationFeatureSlots.First(iteration => iteration.UserStories.Contains(userStory));
+
+        var featureIterationSlot = this.IterationFeatureSlots.First(x => x.UserStories.Contains(userStory));
+        var parentIteration = this.Iterations.First(x => x.Id == featureIterationSlot.ParentIterationId);
+        var parentFeature = this.Features.First(x => x.Id == featureIterationSlot.ParentFeatureId);
+
         iterationFeatureSlot.RemoveUserStory(userStory);
+
+        parentIteration.ReservationDays = this.IterationFeatureSlots.Where(x => x.ParentIterationId == parentIteration.Id).Sum(x => x.UserStories.Sum(y => y.Days));
+        parentIteration.LoadCapacity = this.IterationFeatureSlots.Where(x => x.ParentIterationId == parentIteration.Id).Sum(x => x.UserStories.Sum(y => y.StoryPoints));
+        parentFeature.TotalStoryPoints = this.IterationFeatureSlots.Where(x => x.ParentFeatureId == parentFeature.Id).Sum(x => x.UserStories.Sum(y => y.StoryPoints));
+
         this.informationRepository.SaveChanges();
     }
 
     [RelayCommand]
     private void SendToAzure()
     {
+        this.InsertOrUpdateFeatures();
+        this.InsertOrUpdateUserStories();
+    }
+
+    private void InsertOrUpdateUserStories()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void InsertOrUpdateIterations()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void InsertOrUpdateFeatures()
+    {
+        var request = new RestRequest("collection/project/_apis/wit/workitems/$Feature?api-version=7.0", Method.Post);
+        request.AddHeader("Content-Type", "application/json-patch+json");
+        request.AddHeader("Authorization", "insert token here");
+        var body = JsonConvert.SerializeObject(this.Features.Select(feature =>
+        {
+            return new (string op, string path, string value)[] {
+                new ("add", "/fields/System.Title", feature.Title),
+                new ("add", "/fields/System.Description", string.Empty),
+                new ("add", "/fields/System.Description", string.Empty),
+            };
+        }));
+
+        request.AddParameter("application/json-patch+json", body, ParameterType.RequestBody);
+        var response = client.Execute(request);
+        Console.WriteLine(response.Content);
     }
 
     [RelayCommand]
@@ -279,7 +337,8 @@ internal partial class MainWindowViewModel : ObservableObject
 
         var userStoryToAdd = new UserStory
         {
-            Title = "User story"
+            Title = "User story",
+            UserStoryTrackingType = UserStoryTrackingTypes.StoryPoints
         };
 
         iterationFeatureSlot.AddNewUserStory(userStoryToAdd);

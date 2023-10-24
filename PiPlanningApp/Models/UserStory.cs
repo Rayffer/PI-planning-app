@@ -2,6 +2,8 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
+using PiPlanningApp.Types;
+
 namespace PiPlanningApp.Models;
 
 public partial class UserStory : ObservableObject
@@ -14,6 +16,9 @@ public partial class UserStory : ObservableObject
     [ObservableProperty]
     private decimal storyPoints;
 
+    [ObservableProperty]
+    private decimal days;
+
     [JsonIgnore]
     public bool IsEditing
     {
@@ -24,4 +29,7 @@ public partial class UserStory : ObservableObject
             this.OnPropertyChanged(nameof(this.IsEditing));
         }
     }
+
+    [ObservableProperty]
+    private UserStoryTrackingTypes userStoryTrackingType;
 }

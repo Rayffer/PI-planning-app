@@ -60,7 +60,7 @@
         <sys:Double x:Key="Level3FontSize">16</sys:Double>
         <sys:Double x:Key="Level4FontSize">14</sys:Double>
         <sys:Double x:Key="Level5FontSize">12</sys:Double>
-        <Style TargetType="{x:Type TextBox}" x:Key="PlainTextBox">
+        <Style x:Key="PlainTextBox" TargetType="{x:Type TextBox}">
             <Setter Property="BorderThickness" Value="0,0,0,1.5" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="VerticalContentAlignment" Value="Center" />

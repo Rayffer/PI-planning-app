@@ -26,13 +26,13 @@ public partial class Iteration : ObservableObject
     private decimal loadCapacity;
 
     [ObservableProperty]
-    private int supportDays;
+    private decimal supportDays;
 
     [ObservableProperty]
-    private int defectDays;
+    private decimal defectDays;
 
     [ObservableProperty]
-    private int unplannedDays;
+    private decimal reservationDays;
 
     [ObservableProperty]
     private int iterationNumber;

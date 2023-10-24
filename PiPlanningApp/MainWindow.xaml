@@ -1,17 +1,17 @@
 ﻿<Window
     x:Class="PiPlanningApp.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behaviours="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:PiPlanningApp"
     xmlns:controls="clr-namespace:PiPlanningApp.Controls"
     xmlns:converters="clr-namespace:PiPlanningApp.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:datatemplateselectors="clr-namespace:PiPlanningApp.DataTemplateSelectors"
+    xmlns:local="clr-namespace:PiPlanningApp"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:PiPlanningApp.Models"
-    xmlns:types="clr-namespace:PiPlanningApp.Types"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:types="clr-namespace:PiPlanningApp.Types"
     x:Name="PIPlanningMainWindow"
     Title="PI Planning Application"
     d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
@@ -25,6 +25,7 @@
         <converters:IntegerAddConverter x:Key="IntegerAddConverter" />
         <converters:FeaturesIterationsUserStoriesToGridElementMultiConverter x:Key="FeaturesIterationsUserStoriesToGridElementMultiConverter" />
         <converters:FeatureTypesSkipDefaultValueConverter x:Key="FeatureTypesSkipDefaultValueConverter" />
+        <converters:UserStoryTrackingTypesSkipDefaultValueConverter x:Key="UserStoryTrackingTypesSkipDefaultValueConverter" />
         <converters:StringIsNotNullOrEmptyVisibilityConverter x:Key="StringIsNotNullOrEmptyVisibilityConverter" />
         <converters:StringIsNullOrEmptyVisibilityConverter x:Key="StringIsNullOrEmptyVisibilityConverter" />
         <converters:IntegerGreaterThanOrEqualToOtherVisibilityMultiConverter x:Key="IntegerGreaterThanOrEqualToOtherVisibilityMultiConverter" />
@@ -38,6 +39,14 @@
             ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="types:FeatureTypes" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider
+            x:Key="UserStoryTrackingTypesEnum"
+            MethodName="GetValues"
+            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="types:UserStoryTrackingTypes" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
         <datatemplateselectors:GridElementDataTemplateSelector x:Key="GridElementDataTemplateSelector">
@@ -54,15 +63,21 @@
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="35" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <behaviours:Interaction.Triggers>
                             <behaviours:EventTrigger EventName="MouseEnter">
-                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditFeatureButton" Value="{x:Static Visibility.Visible}" />
+                                <behaviours:ChangePropertyAction
+                                    PropertyName="Visibility"
+                                    TargetName="EditFeatureButton"
+                                    Value="{x:Static Visibility.Visible}" />
                             </behaviours:EventTrigger>
                             <behaviours:EventTrigger EventName="MouseLeave">
-                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditFeatureButton" Value="{x:Static Visibility.Collapsed}" />
+                                <behaviours:ChangePropertyAction
+                                    PropertyName="Visibility"
+                                    TargetName="EditFeatureButton"
+                                    Value="{x:Static Visibility.Collapsed}" />
                             </behaviours:EventTrigger>
                         </behaviours:Interaction.Triggers>
                         <Grid.Style>
@@ -89,7 +104,7 @@
                                             <types:FeatureTypes>Enablers</types:FeatureTypes>
                                         </DataTrigger.Value>
                                         <DataTrigger.Setters>
-                                            <Setter Property="Background" Value="CadetBlue" />
+                                            <Setter Property="Background" Value="Bisque" />
                                         </DataTrigger.Setters>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding FeatureType}">
@@ -168,20 +183,23 @@
                                 FontSize="{StaticResource Level4FontSize}"
                                 Text="SP" />
                         </WrapPanel>
-                        <WrapPanel
-                            Grid.Row="2"
-                            Grid.ColumnSpan="2"
-                            Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}">
+                        <WrapPanel Grid.Row="2" Grid.ColumnSpan="2">
                             <TextBlock
                                 Margin="10,5,0,5"
                                 FontSize="{StaticResource Level4FontSize}"
                                 FontWeight="Bold"
                                 Text="Feature type:" />
+                            <TextBlock
+                                Margin="10,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="{Binding FeatureType}"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
                             <ComboBox
                                 Margin="10,0,0,0"
                                 VerticalContentAlignment="Center"
                                 ItemsSource="{Binding Source={StaticResource FeatureTypesEnum}, Converter={StaticResource FeatureTypesSkipDefaultValueConverter}}"
-                                SelectedItem="{Binding FeatureType}" />
+                                SelectedItem="{Binding FeatureType}"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
                         </WrapPanel>
                         <Button
                             x:Name="EditFeatureButton"
@@ -246,10 +264,16 @@
                         </Grid.RowDefinitions>
                         <behaviours:Interaction.Triggers>
                             <behaviours:EventTrigger EventName="MouseEnter">
-                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditIterationButton" Value="{x:Static Visibility.Visible}" />
+                                <behaviours:ChangePropertyAction
+                                    PropertyName="Visibility"
+                                    TargetName="EditIterationButton"
+                                    Value="{x:Static Visibility.Visible}" />
                             </behaviours:EventTrigger>
                             <behaviours:EventTrigger EventName="MouseLeave">
-                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditIterationButton" Value="{x:Static Visibility.Collapsed}" />
+                                <behaviours:ChangePropertyAction
+                                    PropertyName="Visibility"
+                                    TargetName="EditIterationButton"
+                                    Value="{x:Static Visibility.Collapsed}" />
                             </behaviours:EventTrigger>
                         </behaviours:Interaction.Triggers>
                         <Grid.ContextMenu>
@@ -278,7 +302,8 @@
                                         <Binding Path="IterationName" />
                                         <Binding Path="IterationNumber" />
                                     </MultiBinding>
-                                </TextBlock.Text></TextBlock>
+                                </TextBlock.Text>
+                            </TextBlock>
                             <TextBox
                                 MinWidth="30"
                                 HorizontalAlignment="Center"
@@ -333,8 +358,8 @@
                         </WrapPanel>
                         <Border
                             Grid.Row="2"
+                            Margin="5,0"
                             BorderBrush="Firebrick"
-                            Margin="5, 0"
                             BorderThickness="0,0,0,3">
                             <Border.Visibility>
                                 <MultiBinding Converter="{StaticResource IntegerGreaterThanOrEqualToOtherVisibilityMultiConverter}">
@@ -353,7 +378,7 @@
                                 FontSize="{StaticResource Level4FontSize}"
                                 Text="{Binding SupportDays}"
                                 Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
-                            <controls:IntegerNumericTextbox
+                            <controls:DecimalNumericTextbox
                                 Width="20"
                                 Margin="5,5,0,5"
                                 VerticalAlignment="Top"
@@ -373,7 +398,7 @@
                                 FontSize="{StaticResource Level4FontSize}"
                                 Text="{Binding DefectDays}"
                                 Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
-                            <controls:IntegerNumericTextbox
+                            <controls:DecimalNumericTextbox
                                 Width="20"
                                 Margin="5,5,0,5"
                                 VerticalAlignment="Top"
@@ -382,6 +407,16 @@
                                 Style="{StaticResource PlainTextBox}"
                                 Text="{Binding DefectDays}"
                                 Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
+                        </WrapPanel>
+                        <WrapPanel Grid.Row="3" Grid.Column="2">
+                            <TextBlock
+                                Margin="10,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="Reservation days:" />
+                            <TextBlock
+                                Margin="5,5,0,5"
+                                FontSize="{StaticResource Level4FontSize}"
+                                Text="{Binding ReservationDays}" />
                         </WrapPanel>
                         <Button
                             x:Name="EditIterationButton"
@@ -435,17 +470,25 @@
                         Drop="Grid_Drop">
                         <behaviours:Interaction.Triggers>
                             <behaviours:EventTrigger EventName="MouseEnter">
-                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="AddUserStoryButton" Value="{x:Static Visibility.Visible}" />
+                                <behaviours:ChangePropertyAction
+                                    PropertyName="Visibility"
+                                    TargetName="AddUserStoryButton"
+                                    Value="{x:Static Visibility.Visible}" />
                             </behaviours:EventTrigger>
                             <behaviours:EventTrigger EventName="MouseLeave">
-                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="AddUserStoryButton" Value="{x:Static Visibility.Collapsed}" />
+                                <behaviours:ChangePropertyAction
+                                    PropertyName="Visibility"
+                                    TargetName="AddUserStoryButton"
+                                    Value="{x:Static Visibility.Collapsed}" />
                             </behaviours:EventTrigger>
                         </behaviours:Interaction.Triggers>
                         <ItemsControl AlternationCount="{x:Static sys:Int32.MaxValue}" ItemsSource="{Binding UserStories}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <Grid Margin="15,10" local:GridHelpers.ColumnCount="2"
-                                                         local:GridHelpers.RowCount="{Binding UserStories.Count, Converter={StaticResource FloatDivideCeilingRoundingConverter}, ConverterParameter=2}" />
+                                    <Grid
+                                        Margin="15,10"
+                                        local:GridHelpers.ColumnCount="2"
+                                        local:GridHelpers.RowCount="{Binding UserStories.Count, Converter={StaticResource FloatDivideCeilingRoundingConverter}, ConverterParameter=2}" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
@@ -460,13 +503,20 @@
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition />
                                             <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
                                         <behaviours:Interaction.Triggers>
                                             <behaviours:EventTrigger EventName="MouseEnter">
-                                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditUserStoryButton" Value="{x:Static Visibility.Visible}" />
+                                                <behaviours:ChangePropertyAction
+                                                    PropertyName="Visibility"
+                                                    TargetName="EditUserStoryButton"
+                                                    Value="{x:Static Visibility.Visible}" />
                                             </behaviours:EventTrigger>
                                             <behaviours:EventTrigger EventName="MouseLeave">
-                                                <behaviours:ChangePropertyAction PropertyName="Visibility" TargetName="EditUserStoryButton" Value="{x:Static Visibility.Collapsed}" />
+                                                <behaviours:ChangePropertyAction
+                                                    PropertyName="Visibility"
+                                                    TargetName="EditUserStoryButton"
+                                                    Value="{x:Static Visibility.Collapsed}" />
                                             </behaviours:EventTrigger>
                                         </behaviours:Interaction.Triggers>
                                         <Grid.ContextMenu>
@@ -492,37 +542,132 @@
                                             Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
                                         <TextBox
                                             Margin="10,5,10,0"
+                                            AcceptsReturn="True"
                                             FontSize="{StaticResource Level4FontSize}"
                                             Style="{StaticResource PlainTextBox}"
                                             Text="{Binding Title}"
                                             TextWrapping="Wrap"
-                                            AcceptsReturn="True"
                                             Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
-                                        <WrapPanel
-                                            Grid.Row="2"
-                                            Margin="0,0,15,0"
-                                            HorizontalAlignment="Right">
+                                        <WrapPanel Grid.Row="2" Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}">
                                             <TextBlock
-                                                Grid.Row="2"
-                                                Margin="10,5"
+                                                Margin="10,5,0,5"
                                                 FontSize="{StaticResource Level4FontSize}"
-                                                Text="{Binding StoryPoints}"
-                                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
-                                            <controls:DecimalNumericTextbox
-                                                Grid.Row="2"
-                                                Margin="10,5"
-                                                FontSize="{StaticResource Level4FontSize}"
-                                                Style="{StaticResource PlainTextBox}"
-                                                Text="{Binding StoryPoints}"
-                                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
-                                            <TextBlock
-                                                Grid.Row="2"
-                                                Margin="0,5,10,0"
-                                                FontSize="{StaticResource Level4FontSize}"
-                                                Text="SP" />
+                                                FontWeight="Bold"
+                                                Text="User story type:" />
+                                            <ComboBox
+                                                Margin="10,0,0,0"
+                                                VerticalContentAlignment="Center"
+                                                ItemsSource="{Binding Source={StaticResource UserStoryTrackingTypesEnum}, Converter={StaticResource UserStoryTrackingTypesSkipDefaultValueConverter}}"
+                                                SelectedItem="{Binding UserStoryTrackingType}" />
                                         </WrapPanel>
+                                        <ContentControl
+                                            Grid.Row="3"
+                                            Margin="0,0,15,0"
+                                            HorizontalAlignment="Right"
+                                            Content="{Binding}">
+                                            <ContentControl.Style>
+                                                <Style TargetType="ContentControl">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding UserStoryTrackingType}" Value="{x:Static types:UserStoryTrackingTypes.StoryPoints}">
+                                                            <Setter Property="ContentTemplate">
+                                                                <Setter.Value>
+                                                                    <DataTemplate>
+                                                                        <WrapPanel Orientation="Horizontal">
+                                                                            <TextBlock
+                                                                                Grid.Row="2"
+                                                                                Margin="2,5"
+                                                                                FontSize="{StaticResource Level4FontSize}"
+                                                                                Text="{Binding StoryPoints}"
+                                                                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
+                                                                            <controls:DecimalNumericTextbox
+                                                                                Grid.Row="2"
+                                                                                Margin="2,5"
+                                                                                FontSize="{StaticResource Level4FontSize}"
+                                                                                Style="{StaticResource PlainTextBox}"
+                                                                                Text="{Binding StoryPoints}"
+                                                                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
+                                                                            <TextBlock
+                                                                                Grid.Row="2"
+                                                                                Margin="0,5,10,0"
+                                                                                FontSize="{StaticResource Level4FontSize}"
+                                                                                Text=" SP" />
+                                                                        </WrapPanel>
+                                                                    </DataTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding UserStoryTrackingType}" Value="{x:Static types:UserStoryTrackingTypes.TimeBox}">
+                                                            <Setter Property="ContentTemplate">
+                                                                <Setter.Value>
+                                                                    <DataTemplate>
+                                                                        <WrapPanel Orientation="Horizontal">
+                                                                            <TextBlock
+                                                                                Grid.Row="2"
+                                                                                Margin="2,5"
+                                                                                FontSize="{StaticResource Level4FontSize}"
+                                                                                Text="Timebox: " />
+                                                                            <TextBlock
+                                                                                Grid.Row="2"
+                                                                                Margin="2,5"
+                                                                                FontSize="{StaticResource Level4FontSize}"
+                                                                                Text="{Binding Days}"
+                                                                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
+                                                                            <controls:DecimalNumericTextbox
+                                                                                Grid.Row="2"
+                                                                                Margin="2,5"
+                                                                                FontSize="{StaticResource Level4FontSize}"
+                                                                                Style="{StaticResource PlainTextBox}"
+                                                                                Text="{Binding Days}"
+                                                                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
+                                                                            <TextBlock
+                                                                                Grid.Row="2"
+                                                                                Margin="0,5,10,0"
+                                                                                FontSize="{StaticResource Level4FontSize}"
+                                                                                Text=" days" />
+                                                                        </WrapPanel>
+                                                                    </DataTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding UserStoryTrackingType}" Value="{x:Static types:UserStoryTrackingTypes.Days}">
+                                                            <Setter Property="ContentTemplate">
+                                                                <Setter.Value>
+                                                                    <DataTemplate>
+                                                                        <WrapPanel Orientation="Horizontal">
+                                                                            <TextBlock
+                                                                                Grid.Row="2"
+                                                                                Margin="2,5"
+                                                                                FontSize="{StaticResource Level4FontSize}"
+                                                                                Text="Days reservation: " />
+                                                                            <TextBlock
+                                                                                Grid.Row="2"
+                                                                                Margin="2,5"
+                                                                                FontSize="{StaticResource Level4FontSize}"
+                                                                                Text="{Binding Days}"
+                                                                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsFalseToVisibilityConverter}}" />
+                                                                            <controls:DecimalNumericTextbox
+                                                                                Grid.Row="2"
+                                                                                Margin="2,5"
+                                                                                FontSize="{StaticResource Level4FontSize}"
+                                                                                Style="{StaticResource PlainTextBox}"
+                                                                                Text="{Binding Days}"
+                                                                                Visibility="{Binding IsEditing, Converter={StaticResource BooleanIsTrueToVisibilityConverter}}" />
+                                                                            <TextBlock
+                                                                                Grid.Row="2"
+                                                                                Margin="0,5,10,0"
+                                                                                FontSize="{StaticResource Level4FontSize}"
+                                                                                Text=" days" />
+                                                                        </WrapPanel>
+                                                                    </DataTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ContentControl.Style>
+                                        </ContentControl>
                                         <Polygon
-                                            Grid.Row="2"
+                                            Grid.Row="3"
                                             HorizontalAlignment="Right"
                                             VerticalAlignment="Bottom"
                                             Fill="Goldenrod">
@@ -602,12 +747,26 @@
             </datatemplateselectors:GridElementDataTemplateSelector.IterationFeatureSlotTemplate>
         </datatemplateselectors:GridElementDataTemplateSelector>
     </Window.Resources>
+    <behaviours:Interaction.Triggers>
+        <behaviours:EventTrigger EventName="Loaded">
+            <behaviours:InvokeCommandAction Command="{Binding LoadDataCommand}" />
+        </behaviours:EventTrigger>
+    </behaviours:Interaction.Triggers>
     <Window.DataContext>
         <local:MainWindowViewModel x:Name="MainWindowViewModel" />
     </Window.DataContext>
     <Grid>
-        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" CanContentScroll="False" PreviewMouseWheel="ScrollViewer_MouseWheel" MouseMove="ScrollViewer_MouseMove" Background="AntiqueWhite">
-            <Grid x:Name="MainGrid" SelectiveScrollingGrid.SelectiveScrollingOrientation="Both" RenderTransformOrigin="0.5,0.5">
+        <ScrollViewer
+            Background="AntiqueWhite"
+            CanContentScroll="False"
+            HorizontalScrollBarVisibility="Hidden"
+            MouseMove="ScrollViewer_MouseMove"
+            PreviewMouseWheel="ScrollViewer_MouseWheel"
+            VerticalScrollBarVisibility="Hidden">
+            <Grid
+                x:Name="MainGrid"
+                RenderTransformOrigin="0.5,0.5"
+                SelectiveScrollingGrid.SelectiveScrollingOrientation="Both">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="156" MaxHeight="156" />
                     <RowDefinition />
@@ -689,10 +848,26 @@
                 </ItemsControl>
             </Grid>
         </ScrollViewer>
-        <StackPanel Orientation="Horizontal" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-            <Button Margin="5" Content="Restore zoom to 100%" Command="{Binding RestoreZoomCommand}" FontSize="{StaticResource Level2FontSize}" />
-            <Button Margin="5" Content="Return to origin" Command="{Binding ReturnToOriginCommand}" FontSize="{StaticResource Level2FontSize}" />
-            <Button Margin="5" Content="Send To azure" Command="{Binding SendToAzureCommand}" FontSize="{StaticResource Level2FontSize}" />
+        <StackPanel
+            Margin="5"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Orientation="Horizontal">
+            <Button
+                Margin="5"
+                Command="{Binding RestoreZoomCommand}"
+                Content="Restore zoom to 100%"
+                FontSize="{StaticResource Level2FontSize}" />
+            <Button
+                Margin="5"
+                Command="{Binding ReturnToOriginCommand}"
+                Content="Return to origin"
+                FontSize="{StaticResource Level2FontSize}" />
+            <Button
+                Margin="5"
+                Command="{Binding SendToAzureCommand}"
+                Content="Send To azure"
+                FontSize="{StaticResource Level2FontSize}" />
         </StackPanel>
     </Grid>
 </Window>
