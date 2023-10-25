@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Linq;
-using System.Windows.Documents;
-using System.Windows.Input;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-using Newtonsoft.Json;
+using Microsoft.VisualStudio.Services.Common;
 
+using PiPlanningApp.AzureConnection;
 using PiPlanningApp.Models;
 using PiPlanningApp.Repositories;
 using PiPlanningApp.Types;
@@ -35,11 +33,7 @@ internal partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private double offsetY;
 
-    [ObservableProperty]
-    private List<string> azureIterations;
-
-
-    private readonly  RestClient client;
+    private readonly AzureDevOpsApi AzureDevOpsApiClient;
 
     public ObservableCollection<Iteration> Iterations { get; set; } = new();
     public ObservableCollection<Feature> Features { get; set; } = new();
@@ -59,7 +53,7 @@ internal partial class MainWindowViewModel : ObservableObject
         this.IterationFeatureSlots.Clear();
         this.informationRepository.ApplicationInformation.IterationFeatureSlots.ForEach(this.IterationFeatureSlots.Add);
 
-        this.client = new RestClient("https://dev.azure.com/");
+        this.AzureDevOpsApiClient = new AzureDevOpsApi("insert-organization-name-here", "insert-project-name-here", "insert-token-here");
     }
 
     [RelayCommand]
@@ -216,13 +210,31 @@ internal partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void SendToAzure()
     {
-        this.InsertOrUpdateFeatures();
         this.InsertOrUpdateUserStories();
     }
 
     private void InsertOrUpdateUserStories()
     {
-        throw new NotImplementedException();
+        foreach (var iterationFeatureSlot in this.IterationFeatureSlots)
+        {
+            var parentFeature = this.Features.First(feature => feature.Id == iterationFeatureSlot.ParentFeatureId);
+            var parentIteration = this.Iterations.First(iteration => iteration.Id == iterationFeatureSlot.ParentIterationId).IterationNumber switch
+            {
+                1 => "your-project-name-here\\PI21\\PI21-IT1",
+                2 => "your-project-name-here\\PI21\\PI21-IT2",
+                3 => "your-project-name-here\\PI21\\PI21-IT3",
+                4 => "your-project-name-here\\PI21\\PI21-IT4",
+                5 => "your-project-name-here\\PI21\\PI21-IT5",
+                6 => "your-project-name-here\\PI21\\PI21-IT6",
+                _ => throw new InvalidOperationException("iterations cannot be higher than 6 or lower than 1")
+            };
+
+            iterationFeatureSlot.UserStories.ForEach(async userStory =>
+            {
+                var result = await this.AzureDevOpsApiClient.CreateWorkItemAsync(parentFeature.FeatureNumber.ToString(), parentIteration, userStory.Title, userStory.StoryPoints.ToString());
+            });
+
+        }
     }
 
     private void InsertOrUpdateIterations()
