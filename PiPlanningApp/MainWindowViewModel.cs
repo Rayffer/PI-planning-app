@@ -232,21 +232,7 @@ internal partial class MainWindowViewModel : ObservableObject
 
     private void InsertOrUpdateFeatures()
     {
-        var request = new RestRequest("collection/project/_apis/wit/workitems/$Feature?api-version=7.0", Method.Post);
-        request.AddHeader("Content-Type", "application/json-patch+json");
-        request.AddHeader("Authorization", "insert token here");
-        var body = JsonConvert.SerializeObject(this.Features.Select(feature =>
-        {
-            return new (string op, string path, string value)[] {
-                new ("add", "/fields/System.Title", feature.Title),
-                new ("add", "/fields/System.Description", string.Empty),
-                new ("add", "/fields/System.Description", string.Empty),
-            };
-        }));
-
-        request.AddParameter("application/json-patch+json", body, ParameterType.RequestBody);
-        var response = client.Execute(request);
-        Console.WriteLine(response.Content);
+        throw new NotImplementedException();
     }
 
     [RelayCommand]
